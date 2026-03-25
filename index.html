@@ -1,0 +1,2563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENSLAYER2 — Institutional Crypto Trading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:         #060810;
+  --bg1:        #080c14;
+  --bg2:        #0c1220;
+  --surface:    #0f1624;
+  --card:       #111b2e;
+  --card-hi:    #152035;
+  --border:     #1c2a42;
+  --border-hi:  #243450;
+  --blue:       #3b7eff;
+  --blue-b:     #2563eb;
+  --blue-hi:    #5b9dff;
+  --blue-glow:  rgba(59,126,255,.14);
+  --blue-glow2: rgba(59,126,255,.06);
+  --green:      #10d97c;
+  --green-dim:  rgba(16,217,124,.1);
+  --red:        #ff4560;
+  --red-dim:    rgba(255,69,96,.1);
+  --amber:      #f59e0b;
+  --amber-dim:  rgba(245,158,11,.1);
+  --purple:     #a855f7;
+  --purple-dim: rgba(168,85,247,.1);
+  --text:       #e8eef8;
+  --text2:      #8fa4c8;
+  --text3:      #4a5f82;
+  --sidebar-w:  232px;
+  --font:       'Space Grotesk', sans-serif;
+  --mono:       'Geist Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;font-size:14px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:4px}
+.mono{font-family:var(--mono)}
+.up{color:var(--green)}.down{color:var(--red)}.muted{color:var(--text2)}.dim{color:var(--text3)}
+
+/* ═══════════════════════════════════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════════════════════════════════ */
+#landing{position:fixed;inset:0;z-index:2000;overflow-y:auto;background:var(--bg)}
+#landing.hidden{display:none}
+
+/* Navbar */
+.lnav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:64px;
+  background:rgba(6,8,16,.85);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.lnav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.lnav-logo-icon{
+  width:36px;height:36px;border-radius:9px;
+  background:linear-gradient(135deg,var(--blue),#7c3aed);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:#fff;
+  box-shadow:0 4px 16px rgba(59,126,255,.35);
+  flex-shrink:0;
+}
+.lnav-logo-text{font-size:17px;font-weight:700;letter-spacing:-.3px;color:var(--text)}
+.lnav-logo-text span{color:var(--blue)}
+.lnav-links{display:flex;align-items:center;gap:4px}
+.lnav-link{padding:7px 14px;border-radius:7px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:.15s;text-decoration:none}
+.lnav-link:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.lnav-right{display:flex;align-items:center;gap:10px}
+.lnav-pill{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(16,217,124,.08);border:1px solid rgba(16,217,124,.18);
+  border-radius:20px;padding:4px 12px;font-size:11px;color:var(--green);font-weight:600;
+}
+.lnav-pill-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+
+/* Hero */
+.lhero{
+  min-height:calc(100vh - 64px);display:flex;align-items:center;
+  justify-content:center;flex-direction:column;text-align:center;
+  padding:80px 24px;position:relative;overflow:hidden;
+}
+.lhero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59,126,255,.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(168,85,247,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(16,217,124,.05) 0%, transparent 60%);
+  pointer-events:none;
+}
+.lhero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(59,126,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,126,255,.03) 1px, transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(ellipse 100% 80% at center, black 20%, transparent 80%);
+  pointer-events:none;
+}
+.lhero-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(59,126,255,.08);border:1px solid rgba(59,126,255,.2);
+  border-radius:20px;padding:6px 16px;font-size:12px;color:var(--blue);font-weight:600;
+  margin-bottom:28px;position:relative;z-index:1;
+}
+.lhero-title{
+  font-size:clamp(42px,6vw,80px);font-weight:700;letter-spacing:-2.5px;
+  line-height:1.05;margin-bottom:24px;position:relative;z-index:1;
+}
+.lhero-title em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--blue),var(--purple),var(--green));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.lhero-sub{
+  font-size:18px;color:var(--text2);line-height:1.7;
+  max-width:580px;margin:0 auto 40px;position:relative;z-index:1;
+}
+.lhero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;margin-bottom:64px}
+.lbtn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 28px;border-radius:11px;border:none;cursor:pointer;
+  font-family:var(--font);font-weight:600;font-size:15px;transition:.2s;text-decoration:none;
+}
+.lbtn-primary{
+  background:var(--blue);color:#fff;
+  box-shadow:0 8px 32px rgba(59,126,255,.35),0 0 0 1px rgba(255,255,255,.08) inset;
+}
+.lbtn-primary:hover{background:var(--blue-hi);transform:translateY(-2px);box-shadow:0 12px 40px rgba(59,126,255,.45)}
+.lbtn-outline{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--text)}
+.lbtn-outline:hover{background:rgba(255,255,255,.08);transform:translateY(-2px)}
+.lhero-scroll-hint{position:relative;z-index:1;color:var(--text3);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.lhero-scroll-hint::after{content:'';width:1px;height:32px;background:linear-gradient(var(--text3),transparent)}
+
+/* Live ticker strip */
+.lticker{
+  background:var(--bg1);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:14px 48px;display:flex;align-items:center;gap:32px;overflow-x:auto;
+  scrollbar-width:none;
+}
+.lticker::-webkit-scrollbar{display:none}
+.ltick{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.ltick-sym{font-size:12px;font-weight:700;color:var(--text3);letter-spacing:.4px}
+.ltick-price{font-family:var(--mono);font-size:14px;font-weight:600}
+.ltick-chg{font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:5px;font-weight:600}
+.ltick-chg.up{background:var(--green-dim);color:var(--green)}
+.ltick-chg.down{background:var(--red-dim);color:var(--red)}
+
+/* Stats strip */
+.lstats{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;border-bottom:1px solid var(--border);
+}
+.lstat{
+  padding:32px 40px;border-right:1px solid var(--border);
+  text-align:center;position:relative;overflow:hidden;
+}
+.lstat:last-child{border-right:none}
+.lstat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.lstat:nth-child(1)::before{background:var(--blue)}
+.lstat:nth-child(2)::before{background:var(--green)}
+.lstat:nth-child(3)::before{background:var(--purple)}
+.lstat:nth-child(4)::before{background:var(--amber)}
+.lstat-val{font-family:var(--mono);font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:6px}
+.lstat-lbl{font-size:13px;color:var(--text2)}
+
+/* Features */
+.lfeatures{padding:96px 48px}
+.lsec-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--blue);margin-bottom:12px;text-align:center}
+.lsec-title{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-1.5px;text-align:center;margin-bottom:12px;line-height:1.15}
+.lsec-sub{font-size:16px;color:var(--text2);text-align:center;max-width:540px;margin:0 auto 60px;line-height:1.7}
+.lfeat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.lfeat{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:28px;position:relative;overflow:hidden;transition:.3s;cursor:default;
+}
+.lfeat:hover{border-color:var(--border-hi);transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.4)}
+.lfeat-icon{
+  width:52px;height:52px;border-radius:13px;display:flex;align-items:center;
+  justify-content:center;font-size:22px;margin-bottom:20px;
+}
+.lfeat-title{font-size:17px;font-weight:700;letter-spacing:-.3px;margin-bottom:8px}
+.lfeat-desc{font-size:13px;color:var(--text2);line-height:1.7}
+.lfeat-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  margin-top:16px;padding:3px 10px;border-radius:6px;
+  font-size:10px;font-weight:700;
+}
+.lfeat-glow{position:absolute;bottom:-30px;right:-30px;width:120px;height:120px;border-radius:50%;opacity:.06}
+
+/* How it works */
+.lhow{padding:80px 48px;background:var(--bg1);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.lhow-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;margin-top:56px}
+.lhow-steps::before{content:'';position:absolute;top:28px;left:14%;right:14%;height:1px;background:linear-gradient(90deg,transparent,var(--border),var(--border),transparent)}
+.lhow-step{text-align:center;position:relative}
+.lhow-num{
+  width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:700;margin:0 auto 20px;
+  background:var(--card);border:1px solid var(--border);
+  position:relative;z-index:1;
+}
+.lhow-step.active .lhow-num{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 8px 24px rgba(59,126,255,.4)}
+.lhow-step-title{font-size:15px;font-weight:700;margin-bottom:6px}
+.lhow-step-desc{font-size:12px;color:var(--text2);line-height:1.7}
+
+/* Testimonials */
+.ltestimonials{padding:80px 48px}
+.ltesti-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px}
+.ltesti{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px}
+.ltesti-quote{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:20px;font-style:italic}
+.ltesti-author{display:flex;align-items:center;gap:10px}
+.ltesti-avatar{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.ltesti-name{font-size:13px;font-weight:600}
+.ltesti-role{font-size:11px;color:var(--text3);margin-top:1px}
+.ltesti-stars{color:var(--amber);font-size:12px;margin-bottom:12px}
+
+/* CTA Banner */
+.lcta{
+  margin:0 48px 80px;padding:56px 64px;
+  background:linear-gradient(135deg,#0a1428 0%,#0f1640 50%,#140f28 100%);
+  border:1px solid rgba(59,126,255,.2);border-radius:20px;
+  text-align:center;position:relative;overflow:hidden;
+}
+.lcta::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:400px;height:200px;background:radial-gradient(ellipse,rgba(59,126,255,.12),transparent);pointer-events:none}
+.lcta-title{font-size:clamp(24px,4vw,40px);font-weight:700;letter-spacing:-1px;margin-bottom:12px;position:relative;z-index:1}
+.lcta-sub{font-size:15px;color:var(--text2);margin-bottom:32px;position:relative;z-index:1}
+.lcta-btns{display:flex;gap:12px;justify-content:center;position:relative;z-index:1}
+
+/* Footer */
+.lfooter{
+  border-top:1px solid var(--border);padding:48px;
+  display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:40px;
+}
+.lfoot-brand .logo{font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:8px}
+.lfoot-brand .logo span{color:var(--blue)}
+.lfoot-brand p{font-size:12px;color:var(--text3);line-height:1.7;max-width:220px;margin-bottom:16px}
+.lfoot-socials{display:flex;gap:8px}
+.lfoot-social{width:32px;height:32px;border-radius:7px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:.15s}
+.lfoot-social:hover{border-color:var(--blue);background:var(--blue-glow)}
+.lfoot-col-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:14px}
+.lfoot-link{font-size:13px;color:var(--text2);display:block;padding:4px 0;cursor:pointer;transition:.15s;text-decoration:none}
+.lfoot-link:hover{color:var(--blue)}
+.lfooter-bottom{border-top:1px solid var(--border);padding:20px 48px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text3)}
+.lfooter-bottom a{color:var(--text3);text-decoration:none;transition:.15s}
+.lfooter-bottom a:hover{color:var(--blue)}
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTH SCREEN
+═══════════════════════════════════════════════════════════════ */
+#auth {
+  position:fixed;inset:0;z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);overflow:hidden;
+}
+.auth-bg {
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 20% 50%, rgba(59,126,255,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 30%, rgba(168,85,247,.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 50% at 60% 80%, rgba(16,217,124,.04) 0%, transparent 60%);
+}
+.auth-grid {
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(59,126,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,126,255,.04) 1px, transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 80% 80% at center, black 30%, transparent 80%);
+}
+.auth-wrap {
+  display:grid;grid-template-columns:1fr 1fr;
+  width:min(900px,95vw);gap:0;
+  background:var(--card);border:1px solid var(--border-hi);
+  border-radius:20px;overflow:hidden;position:relative;z-index:1;
+  box-shadow:0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03) inset;
+}
+.auth-hero {
+  background:linear-gradient(145deg, #0a1428 0%, #0d1f3c 100%);
+  padding:48px;display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.auth-hero::before {
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 100% 60% at 0% 100%, rgba(59,126,255,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 40% at 100% 0%, rgba(168,85,247,.08) 0%, transparent 60%);
+}
+.auth-hero-logo {
+  font-size:24px;font-weight:700;letter-spacing:-0.5px;position:relative;z-index:1;
+}
+.auth-hero-logo span{color:var(--blue)}
+.auth-hero-badge {
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(59,126,255,.1);border:1px solid rgba(59,126,255,.2);
+  border-radius:6px;padding:4px 10px;font-size:11px;color:var(--blue);
+  font-weight:500;margin-top:8px;
+}
+.auth-hero-main{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:center;padding:24px 0}
+.auth-hero-title{font-size:32px;font-weight:700;letter-spacing:-1px;line-height:1.2;margin-bottom:12px}
+.auth-hero-title em{font-style:normal;color:var(--blue)}
+.auth-hero-sub{font-size:13px;color:var(--text2);line-height:1.7;max-width:280px}
+.auth-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:1}
+.auth-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px}
+.auth-stat .val{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text)}
+.auth-stat .lbl{font-size:11px;color:var(--text3);margin-top:2px}
+.auth-form-area{padding:40px}
+.auth-form-title{font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
+.auth-form-sub{font-size:13px;color:var(--text2);margin-bottom:28px}
+.auth-tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:24px}
+.auth-tab{flex:1;padding:8px;text-align:center;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);transition:.2s}
+.auth-tab.active{background:var(--card-hi);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.fg{margin-bottom:14px}
+.fg label{display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.fg label a{color:var(--blue);cursor:pointer;text-transform:none;letter-spacing:0}
+.fg input,.fg select{
+  width:100%;background:var(--bg2);border:1px solid var(--border);
+  border-radius:9px;padding:11px 14px;color:var(--text);
+  font-family:var(--font);font-size:14px;outline:none;transition:.2s;
+}
+.fg input:focus,.fg select:focus{border-color:var(--blue);background:rgba(59,126,255,.04);box-shadow:0 0 0 3px rgba(59,126,255,.08)}
+.fg input::placeholder{color:var(--text3)}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:11px 20px;border-radius:9px;border:none;cursor:pointer;
+  font-family:var(--font);font-weight:600;font-size:14px;transition:.15s;
+  text-decoration:none;white-space:nowrap;
+}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 4px 16px rgba(59,126,255,.3)}
+.btn-primary:hover{background:var(--blue-hi);transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,126,255,.4)}
+.btn-outline{background:transparent;border:1px solid var(--border-hi);color:var(--text2)}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+.btn-ghost{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{background:rgba(255,255,255,.07);color:var(--text)}
+.btn-green{background:var(--green);color:#031a10;font-weight:700}
+.btn-green:hover{opacity:.9;transform:translateY(-1px)}
+.btn-red{background:var(--red);color:#fff;font-weight:700}
+.btn-red:hover{opacity:.9;transform:translateY(-1px)}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:7px}
+.btn-xs{padding:4px 10px;font-size:11px;border-radius:6px}
+.btn-full{width:100%}
+.auth-sep{display:flex;align-items:center;gap:12px;margin:16px 0;font-size:12px;color:var(--text3)}
+.auth-sep::before,.auth-sep::after{content:'';flex:1;height:1px;background:var(--border)}
+.demo-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.demo-btn{
+  background:var(--bg2);border:1px solid var(--border);border-radius:9px;
+  padding:10px;cursor:pointer;font-family:var(--font);font-size:12px;
+  color:var(--text2);transition:.15s;text-align:center;
+}
+.demo-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-glow2)}
+.demo-btn .ico{font-size:16px;display:block;margin-bottom:3px}
+
+/* ═══════════════════════════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════════════════════════ */
+#app{display:none;height:100vh;flex-direction:row}
+#sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--bg1);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;height:100vh;position:sticky;top:0;
+}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.sb-logo-inner{display:flex;align-items:center;gap:10px}
+.sb-logo-icon{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--blue),#7c3aed);
+  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;
+  box-shadow:0 4px 12px rgba(59,126,255,.3);
+}
+.sb-logo-text{font-size:15px;font-weight:700;letter-spacing:-0.3px}
+.sb-logo-text span{color:var(--blue)}
+.sb-logo-ver{font-size:10px;color:var(--text3);letter-spacing:.5px;margin-top:1px}
+.sb-scroll{flex:1;overflow-y:auto;padding:12px 10px}
+.sb-section{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);padding:14px 10px 6px;margin-top:4px}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;
+  cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;
+  transition:.15s;margin-bottom:1px;position:relative;
+}
+.sb-item:hover{background:var(--bg2);color:var(--text)}
+.sb-item.active{background:var(--blue-glow);color:var(--blue);border:1px solid rgba(59,126,255,.18)}
+.sb-item.active::before{content:'';position:absolute;left:-10px;top:6px;bottom:6px;width:3px;background:var(--blue);border-radius:0 2px 2px 0}
+.sb-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(255,255,255,.04);flex-shrink:0}
+.sb-item.active .sb-icon{background:var(--blue-glow);color:var(--blue)}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center}
+.sb-badge-new{background:var(--blue);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:auto}
+.sb-footer{padding:12px 10px;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;cursor:pointer;transition:.15s}
+.sb-user:hover{background:var(--bg2)}
+.sb-avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--blue),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.sb-user-info{flex:1;min-width:0}
+.sb-user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:10px;color:var(--text3);margin-top:1px}
+.sb-logout{font-size:16px;color:var(--text3);cursor:pointer;padding:4px;border-radius:5px;transition:.15s}
+.sb-logout:hover{color:var(--red);background:var(--red-dim)}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN AREA
+═══════════════════════════════════════════════════════════════ */
+#main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+#ticker{
+  height:38px;background:var(--bg1);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;gap:0;overflow:hidden;flex-shrink:0;
+}
+.tick-item{display:flex;align-items:center;gap:8px;padding:0 18px;border-right:1px solid var(--border)}
+.tick-item:first-child{padding-left:0}
+.tick-sym{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.4px}
+.tick-price{font-family:var(--mono);font-size:12px;font-weight:500}
+.tick-chg{font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600}
+.tick-chg.up{background:var(--green-dim);color:var(--green)}
+.tick-chg.down{background:var(--red-dim);color:var(--red)}
+#content{flex:1;overflow-y:auto}
+.page{display:none;padding:28px}
+.page.active{display:block}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;gap:16px}
+.ph-left{}
+.ph-title{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.ph-sub{font-size:13px;color:var(--text2);margin-top:3px}
+.ph-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
+
+/* ═══════════════════════════════════════════════════════════════
+   STAT CARDS
+═══════════════════════════════════════════════════════════════ */
+.stat-row{display:grid;gap:14px;margin-bottom:20px}
+.stat-row.c4{grid-template-columns:repeat(4,1fr)}
+.stat-row.c3{grid-template-columns:repeat(3,1fr)}
+.stat-row.c2{grid-template-columns:repeat(2,1fr)}
+.sc{
+  background:var(--card);border:1px solid var(--border);border-radius:13px;
+  padding:18px 20px;position:relative;overflow:hidden;transition:.2s;
+}
+.sc:hover{border-color:var(--border-hi);background:var(--card-hi)}
+.sc-accent{position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;opacity:.08;transform:translate(20px,-20px)}
+.sc-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.sc-val{font-family:var(--mono);font-size:24px;font-weight:600;letter-spacing:-0.5px}
+.sc-sub{font-size:12px;color:var(--text2);margin-top:5px;display:flex;align-items:center;gap:5px}
+.sc-sub .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700}
+.sc-sub .badge.up{background:var(--green-dim);color:var(--green)}
+.sc-sub .badge.down{background:var(--red-dim);color:var(--red)}
+.sc-icon{position:absolute;top:18px;right:18px;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+
+/* ═══════════════════════════════════════════════════════════════
+   GENERIC CARD
+═══════════════════════════════════════════════════════════════ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px}
+.card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════════ */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr 380px;grid-template-rows:auto auto 1fr;gap:14px}
+.pf-hero{
+  grid-column:1/4;background:var(--card);border:1px solid var(--border);border-radius:13px;
+  padding:24px 28px;position:relative;overflow:hidden;
+}
+.pf-hero::before{
+  content:'';position:absolute;top:-40px;left:-40px;width:300px;height:300px;
+  background:radial-gradient(circle, rgba(59,126,255,.06) 0%, transparent 70%);
+  pointer-events:none;
+}
+.pf-hero-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:24px;margin-bottom:20px}
+.pf-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:6px}
+.pf-value{font-family:var(--mono);font-size:40px;font-weight:600;letter-spacing:-1.5px;line-height:1}
+.pf-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:7px;font-family:var(--mono);font-size:13px;font-weight:600;margin-top:10px}
+.pf-badge.up{background:var(--green-dim);color:var(--green)}
+.pf-badge.down{background:var(--red-dim);color:var(--red)}
+.pf-actions{display:flex;gap:8px}
+.pf-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:9px;overflow:hidden}
+.pf-metric{background:var(--bg2);padding:12px 16px}
+.pf-metric .mk{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.pf-metric .mv{font-family:var(--mono);font-size:15px;font-weight:600}
+.activity-feed{grid-column:4/5;grid-row:1/4;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:0;overflow:hidden;display:flex;flex-direction:column}
+.af-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.af-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3)}
+.af-live{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600}
+.af-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.af-body{flex:1;overflow-y:auto;padding:8px}
+.af-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:9px;cursor:pointer;transition:.15s;margin-bottom:2px}
+.af-item:hover{background:var(--bg2)}
+.af-coin{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.af-info{flex:1;min-width:0}
+.af-pair{font-size:12px;font-weight:600}
+.af-time{font-size:10px;color:var(--text3);margin-top:1px}
+.af-right{text-align:right}
+.af-price{font-family:var(--mono);font-size:12px;font-weight:500}
+.af-chg{font-family:var(--mono);font-size:10px;font-weight:600;margin-top:1px}
+.alloc-card{grid-column:1/3;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px}
+.alloc-list{display:flex;flex-direction:column;gap:8px}
+.alloc-item{display:flex;align-items:center;gap:12px}
+.alloc-coin{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.alloc-name{font-size:13px;font-weight:600;min-width:40px}
+.alloc-bar-wrap{flex:1;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.alloc-bar{height:100%;border-radius:2px;transition:.6s ease}
+.alloc-pct{font-family:var(--mono);font-size:11px;color:var(--text2);min-width:36px;text-align:right}
+.alloc-usd{font-family:var(--mono);font-size:12px;font-weight:500;min-width:80px;text-align:right}
+.positions-mini{grid-column:3/4;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px;overflow:hidden}
+.pm-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
+.pm-item:last-child{border-bottom:none}
+
+/* ═══════════════════════════════════════════════════════════════
+   TRADE PAGE
+═══════════════════════════════════════════════════════════════ */
+#page-trade{padding:0;height:calc(100vh - 38px);display:none;flex-direction:column}
+#page-trade.active{display:flex}
+.trade-topbar{
+  height:52px;background:var(--bg1);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:0;flex-shrink:0;
+}
+.pair-switcher{display:flex;align-items:center;gap:4px;padding:0 16px;border-right:1px solid var(--border);height:100%}
+.pair-btn{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap}
+.pair-btn:hover{background:var(--bg2)}
+.pair-btn.active{background:var(--blue-glow);color:var(--blue)}
+.pair-btn .sym{font-size:13px;font-weight:700}
+.pair-btn .pr{font-family:var(--mono);font-size:11px;color:var(--text2)}
+.pair-btn .chg{font-family:var(--mono);font-size:10px;padding:1px 5px;border-radius:4px}
+.pair-btn .chg.up{background:var(--green-dim);color:var(--green)}
+.pair-btn .chg.down{background:var(--red-dim);color:var(--red)}
+.trade-meta{display:flex;align-items:center;gap:24px;padding:0 20px;height:100%;flex:1}
+.tm-price{font-family:var(--mono);font-size:22px;font-weight:600;letter-spacing:-0.5px}
+.tm-chg{font-family:var(--mono);font-size:12px;padding:3px 8px;border-radius:6px;font-weight:600}
+.tm-chg.up{background:var(--green-dim);color:var(--green)}
+.tm-chg.down{background:var(--red-dim);color:var(--red)}
+.tm-stat{padding:0 16px;border-left:1px solid var(--border)}
+.tm-stat .k{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.tm-stat .v{font-family:var(--mono);font-size:13px;margin-top:2px;font-weight:500}
+.trade-body{flex:1;display:grid;grid-template-columns:1fr 280px;overflow:hidden}
+.chart-pane{display:flex;flex-direction:column;border-right:1px solid var(--border)}
+.chart-tools{
+  height:38px;background:var(--bg1);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 12px;gap:4px;flex-shrink:0;
+}
+.tf-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);background:none;border:none;font-family:var(--font);transition:.15s}
+.tf-btn.active{background:var(--bg2);color:var(--text)}
+.tf-btn:hover:not(.active){color:var(--text)}
+.ct-sep{width:1px;height:16px;background:var(--border);margin:0 6px}
+.ct-legend{display:flex;gap:12px;align-items:center;font-size:10px;color:var(--text3)}
+.ct-dot{width:20px;height:2px;border-radius:1px;display:inline-block}
+canvas#chart{flex:1;display:block;width:100%}
+.order-pane{display:flex;flex-direction:column;background:var(--bg1);overflow-y:auto}
+.ob-wrap{padding:12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.ob-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:8px;display:flex;justify-content:space-between}
+.ob-hdr{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:9.5px;color:var(--text3);font-weight:600;padding:2px 0;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.ob-row{display:grid;grid-template-columns:1fr 1fr 1fr;font-family:var(--mono);font-size:10.5px;padding:3px 0;position:relative;cursor:default;transition:.05s;border-radius:3px}
+.ob-row:hover{background:rgba(255,255,255,.03)}
+.ob-depth{position:absolute;top:0;bottom:0;right:0;border-radius:2px;opacity:.12}
+.ob-depth.ask{background:var(--red)}
+.ob-depth.bid{background:var(--green)}
+.ob-spread{text-align:center;padding:5px;font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg2);border-radius:5px;margin:4px 0}
+.of-wrap{padding:12px;flex:1}
+.side-row{display:flex;gap:6px;margin-bottom:12px}
+.side-btn{flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);background:none;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+.side-btn.buy.active{background:var(--green);border-color:var(--green);color:#021809}
+.side-btn.sell.active{background:var(--red);border-color:var(--red);color:#fff}
+.side-btn:not(.active){color:var(--text2)}
+.side-btn:not(.active):hover{background:var(--bg2)}
+.ot-row{display:flex;gap:4px;margin-bottom:12px}
+.ot-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);transition:.15s;border:1px solid transparent;font-family:var(--font);background:none}
+.ot-btn.active{border-color:var(--border-hi);background:var(--bg2);color:var(--text)}
+.of-group{margin-bottom:10px}
+.of-label{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.of-label .bal{font-family:var(--mono);color:var(--text2);text-transform:none;letter-spacing:0}
+.of-input-wrap{position:relative}
+.of-input-wrap input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 44px 9px 12px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:.2s}
+.of-input-wrap input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow2)}
+.of-unit{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:600;color:var(--text3)}
+.pct-row{display:flex;gap:4px;margin-bottom:10px}
+.pct-b{flex:1;padding:5px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--text3);font-size:10px;font-weight:600;cursor:pointer;transition:.15s;font-family:var(--font)}
+.pct-b:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-glow2)}
+.lev-wrap{margin-bottom:12px}
+.lev-label{display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.lev-val{color:var(--blue);font-family:var(--mono)}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--border-hi);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--blue);cursor:pointer;box-shadow:0 0 0 3px var(--blue-glow)}
+.lev-marks{display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:4px;font-family:var(--mono)}
+.order-summary{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px;margin-bottom:10px}
+.os-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0}
+.os-row .k{color:var(--text3)}
+.os-row .v{font-family:var(--mono);color:var(--text)}
+.submit-btn{width:100%;padding:11px;border-radius:9px;border:none;cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;transition:.15s}
+.submit-btn.buy{background:var(--green);color:#021809}
+.submit-btn.sell{background:var(--red);color:#fff}
+.submit-btn:hover{opacity:.9;transform:translateY(-1px)}
+.trade-footer{border-top:1px solid var(--border);flex-shrink:0;background:var(--bg1)}
+.tf-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 16px}
+.tf-tab{padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:.15s}
+.tf-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.pos-table-wrap{max-height:180px;overflow-y:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:8px 14px;text-align:left;position:sticky;top:0;background:var(--bg1);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid rgba(28,42,66,.5);font-size:12px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.01)}
+.side-chip{padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.side-chip.long{background:var(--green-dim);color:var(--green)}
+.side-chip.short{background:var(--red-dim);color:var(--red)}
+.pnl-val{font-family:var(--mono);font-size:12px;font-weight:600}
+.act-btn{background:transparent;border:1px solid var(--border-hi);color:var(--text2);padding:3px 9px;border-radius:5px;cursor:pointer;font-size:10px;font-family:var(--font);font-weight:600;transition:.15s}
+.act-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* ═══════════════════════════════════════════════════════════════
+   WALLET
+═══════════════════════════════════════════════════════════════ */
+.wallet-hero{
+  background:linear-gradient(135deg,var(--card) 0%, var(--bg2) 100%);
+  border:1px solid var(--border);border-radius:14px;padding:28px;
+  margin-bottom:20px;position:relative;overflow:hidden;
+}
+.wallet-hero::before{
+  content:'';position:absolute;bottom:-40px;right:-40px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(59,126,255,.08),transparent);
+}
+.wallet-total-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:8px}
+.wallet-total{font-family:var(--mono);font-size:44px;font-weight:600;letter-spacing:-2px;line-height:1}
+.wallet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.wc{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;
+  transition:.2s;cursor:pointer;position:relative;overflow:hidden;
+}
+.wc:hover{border-color:var(--border-hi);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.wc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.wc-coin{display:flex;align-items:center;gap:10px}
+.wc-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.wc-name{font-size:14px;font-weight:700}
+.wc-full{font-size:11px;color:var(--text2)}
+.wc-chg{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600}
+.wc-chg.up{background:var(--green-dim);color:var(--green)}
+.wc-chg.down{background:var(--red-dim);color:var(--red)}
+.wc-amount{font-family:var(--mono);font-size:20px;font-weight:600;letter-spacing:-0.5px;margin-bottom:3px}
+.wc-usd{font-family:var(--mono);font-size:12px;color:var(--text2)}
+.wc-btns{display:flex;gap:6px;margin-top:14px}
+.wc-bar{position:absolute;bottom:0;left:0;right:0;height:2px}
+.tx-table-wrap{overflow-x:auto}
+.tx-type{padding:2px 9px;border-radius:5px;font-size:10px;font-weight:700}
+.tx-type.deposit{background:var(--green-dim);color:var(--green)}
+.tx-type.withdraw{background:var(--red-dim);color:var(--red)}
+.tx-status{padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;background:var(--green-dim);color:var(--green)}
+
+/* ═══════════════════════════════════════════════════════════════
+   EARN
+═══════════════════════════════════════════════════════════════ */
+.earn-hero{
+  background:linear-gradient(135deg,#0a1f14 0%,#0c1a28 100%);
+  border:1px solid var(--border);border-radius:14px;padding:28px;
+  margin-bottom:20px;position:relative;overflow:hidden;
+}
+.earn-hero::before{content:'';position:absolute;top:-30px;right:60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(16,217,124,.08),transparent)}
+.earn-hero-title{font-size:26px;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px}
+.earn-hero-title em{font-style:normal;color:var(--green)}
+.earn-hero-sub{font-size:13px;color:var(--text2);max-width:500px;line-height:1.7}
+.stake-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.stake-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:22px;position:relative;overflow:hidden;transition:.2s;
+}
+.stake-card:hover{border-color:var(--border-hi);transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.4)}
+.stake-glow{position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;opacity:.1}
+.stake-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.stake-coin-info{display:flex;align-items:center;gap:12px}
+.stake-apy{font-family:var(--mono);font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--green),#60efb0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.apy-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+.stake-divider{height:1px;background:var(--border);margin:14px 0}
+.stake-stat-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px}
+.stake-stat-row .sk{color:var(--text2)}
+.stake-stat-row .sv{font-family:var(--mono);font-weight:600}
+.stake-progress{height:4px;background:var(--bg2);border-radius:2px;margin:12px 0}
+.stake-progress-bar{height:100%;border-radius:2px;transition:.6s}
+.stake-pool-label{font-size:10px;color:var(--text3);margin-bottom:4px}
+.earn-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:10px;overflow:hidden;margin-top:16px}
+.es-item{background:var(--bg2);padding:12px 16px}
+.es-item .ek{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.es-item .ev{font-family:var(--mono);font-size:16px;font-weight:600}
+
+/* ═══════════════════════════════════════════════════════════════
+   COPY TRADING
+═══════════════════════════════════════════════════════════════ */
+.copy-hero{background:linear-gradient(135deg,#0f1428 0%,#140f28 100%);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden}
+.copy-hero::before{content:'';position:absolute;top:-20px;right:40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.08),transparent)}
+.trader-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.trader-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:0;overflow:hidden;transition:.2s;
+}
+.trader-card:hover{border-color:var(--border-hi);transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.4)}
+.tc-banner{height:72px;position:relative;display:flex;align-items:flex-end;padding:12px}
+.tc-avatar{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;border:3px solid var(--bg1);position:absolute;bottom:-24px;left:16px}
+.tc-body{padding:32px 16px 16px}
+.tc-name{font-size:15px;font-weight:700;margin-bottom:2px}
+.tc-meta{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.tc-verified{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--blue);font-weight:600;background:var(--blue-glow);border:1px solid rgba(59,126,255,.2);padding:2px 7px;border-radius:5px}
+.tc-country{font-size:14px}
+.tc-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border-radius:9px;overflow:hidden;margin-bottom:12px}
+.tc-stat{background:var(--bg2);padding:10px 12px;text-align:center}
+.tc-stat .tsk{font-size:9.5px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.tc-stat .tsv{font-family:var(--mono);font-size:14px;font-weight:700}
+.tc-desc{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:12px;min-height:34px}
+.tc-followers{font-size:11px;color:var(--text3);margin-bottom:12px}
+.follow-btn{width:100%;padding:9px;border-radius:8px;border:1px solid var(--border-hi);background:none;color:var(--text2);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:.2s}
+.follow-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-glow2)}
+.follow-btn.following{background:var(--blue);border-color:var(--blue);color:#fff}
+.perf-chart{height:36px;display:block;width:100%;margin-bottom:8px}
+
+/* ═══════════════════════════════════════════════════════════════
+   KYC
+═══════════════════════════════════════════════════════════════ */
+.kyc-layout{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
+.kyc-sidebar{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px}
+.kyc-step-item{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+.kyc-step-item:last-child{border-bottom:none}
+.ksi-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;border:2px solid var(--border-hi);color:var(--text3);transition:.3s}
+.ksi-circle.done{background:var(--green);border-color:var(--green);color:#021809}
+.ksi-circle.active{border-color:var(--blue);color:var(--blue);background:var(--blue-glow)}
+.ksi-info .ksi-title{font-size:13px;font-weight:600;transition:.3s}
+.ksi-info .ksi-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.kyc-step-item.active .ksi-title{color:var(--blue)}
+.kyc-main{background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden}
+.kyc-pane{display:none;padding:28px}
+.kyc-pane.active{display:block}
+.kyc-pane-title{font-size:18px;font-weight:700;letter-spacing:-0.3px;margin-bottom:4px}
+.kyc-pane-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.kyc-limits{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:20px}
+.kyc-limits-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:10px}
+.kyc-limit-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border)}
+.kyc-limit-row:last-child{border-bottom:none}
+.kyc-limit-row .lk{color:var(--text2)}
+.kyc-limit-row .lv{font-family:var(--mono);font-weight:600}
+.kyc-limit-row .lv.locked{color:var(--text3)}
+.kyc-limit-row .lv.unlocked{color:var(--green)}
+.upload-zone{
+  border:2px dashed var(--border-hi);border-radius:11px;padding:28px;
+  text-align:center;cursor:pointer;transition:.2s;margin-bottom:12px;
+}
+.upload-zone:hover{border-color:var(--blue);background:var(--blue-glow2)}
+.upload-zone.done{border-color:var(--green);background:var(--green-dim)}
+.upload-ico{font-size:28px;margin-bottom:8px}
+.upload-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.upload-sub{font-size:11px;color:var(--text3)}
+.kyc-footer{display:flex;gap:8px;padding:20px 28px;border-top:1px solid var(--border);background:var(--bg2)}
+.kyc-alert{display:flex;align-items:flex-start;gap:10px;padding:14px;border-radius:9px;font-size:13px;margin-bottom:20px}
+.kyc-alert.pending{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--amber)}
+.kyc-alert.verified{background:var(--green-dim);border:1px solid rgba(16,217,124,.2);color:var(--green)}
+.kyc-benefit{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;border-bottom:1px solid var(--border)}
+.kyc-benefit:last-child{border-bottom:none}
+.kyc-benefit .ico{font-size:16px}
+
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN
+═══════════════════════════════════════════════════════════════ */
+.admin-banner{background:linear-gradient(135deg,#140a28 0%,#0a1428 100%);border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:22px 28px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.ab-left{display:flex;align-items:center;gap:14px}
+.ab-icon{width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:20px}
+.ab-title{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+.ab-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.ab-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);border-radius:7px;padding:5px 12px;font-size:12px;color:var(--purple);font-weight:600}
+.admin-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+.status-dot.active{background:var(--green)}
+.status-dot.suspended{background:var(--red)}
+.status-dot.pending{background:var(--amber)}
+.kyc-chip{padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700}
+.kyc-chip.verified{background:var(--green-dim);color:var(--green)}
+.kyc-chip.pending{background:var(--amber-dim);color:var(--amber)}
+.kyc-chip.none{background:var(--bg2);color:var(--text3)}
+.admin-act-btns{display:flex;gap:5px}
+.log-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px}
+.log-item:last-child{border-bottom:none}
+.log-action{padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;background:var(--blue-glow);color:var(--blue);min-width:70px;text-align:center}
+.log-action.trade{background:var(--green-dim);color:var(--green)}
+.log-action.withdraw{background:var(--red-dim);color:var(--red)}
+.log-action.kyc{background:var(--amber-dim);color:var(--amber)}
+.log-action.suspend{background:var(--red-dim);color:var(--red)}
+.platform-health{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px}
+.ph-metric{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.ph-metric:last-child{border-bottom:none}
+.ph-bar-wrap{width:120px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.ph-bar{height:100%;border-radius:2px;background:var(--green)}
+
+/* ═══════════════════════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════════════════════ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border-hi);border-radius:16px;padding:28px;width:430px;max-width:95vw;box-shadow:0 40px 80px rgba(0,0,0,.6)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.modal-title{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+.modal-close{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.modal-close:hover{background:var(--bg2);color:var(--text)}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════ */
+#toasts{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{
+  background:var(--card-hi);border:1px solid var(--border-hi);border-radius:10px;
+  padding:12px 16px;font-size:13px;font-weight:500;display:flex;align-items:center;
+  gap:10px;min-width:280px;pointer-events:all;
+  animation:toastIn .25s cubic-bezier(.2,.8,.2,1) both;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--blue)}
+.toast.warn{border-left:3px solid var(--amber)}
+.toast-icon{font-size:16px;flex-shrink:0}
+.toast-body{flex:1}
+.toast-title{font-weight:700;font-size:13px}
+.toast-msg{font-size:11px;color:var(--text2);margin-top:1px}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px) scale(.96)}to{opacity:1;transform:none}}
+
+/* ═══════════════════════════════════════════════════════════════
+   COIN COLOR HELPERS
+═══════════════════════════════════════════════════════════════ */
+.ci-btc{background:rgba(247,147,26,.12);color:#f7931a}
+.ci-eth{background:rgba(98,126,234,.12);color:#627eea}
+.ci-sol{background:rgba(153,69,255,.12);color:#9945ff}
+.ci-usdt{background:rgba(38,161,123,.12);color:#26a17b}
+.ci-bnb{background:rgba(243,186,47,.12);color:#f3ba2f}
+.ci-xrp{background:rgba(0,170,228,.12);color:#00aae4}
+.cb-btc{background:#f7931a}.cb-eth{background:#627eea}
+.cb-sol{background:#9945ff}.cb-usdt{background:#26a17b}
+.cb-bnb{background:#f3ba2f}.cb-xrp{background:#00aae4}
+.ct-btc{color:#f7931a}.ct-eth{color:#627eea}
+.ct-sol{color:#9945ff}.ct-usdt{color:#26a17b}
+.ct-bnb{color:#f3ba2f}.ct-xrp{color:#00aae4}
+
+/* ═══════════════════════════════════════════════════════════════
+   MISC HELPERS
+═══════════════════════════════════════════════════════════════ */
+.empty{text-align:center;padding:32px 16px;color:var(--text3)}
+.empty .ei{font-size:28px;margin-bottom:8px}
+.empty .et{font-size:12px}
+.sep{width:1px;height:100%;background:var(--border)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700}
+.tag-blue{background:var(--blue-glow);color:var(--blue)}
+.tag-green{background:var(--green-dim);color:var(--green)}
+.tag-red{background:var(--red-dim);color:var(--red)}
+.tag-amber{background:var(--amber-dim);color:var(--amber)}
+.tag-purple{background:var(--purple-dim);color:var(--purple)}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ LANDING ═══════════════════════ -->
+<div id="landing">
+
+  <!-- NAVBAR -->
+  <nav class="lnav">
+    <a class="lnav-logo" href="#">
+      <div class="lnav-logo-icon">E2</div>
+      <div class="lnav-logo-text">EN<span>SLAYER</span>2</div>
+    </a>
+    <div class="lnav-links">
+      <a class="lnav-link" onclick="scrollTo('#features')">Features</a>
+      <a class="lnav-link" onclick="scrollTo('#howitworks')">How It Works</a>
+      <a class="lnav-link" onclick="scrollTo('#earn-sec')">Earn</a>
+      <a class="lnav-link" onclick="scrollTo('#testimonials')">Reviews</a>
+    </div>
+    <div class="lnav-right">
+      <div class="lnav-pill"><div class="lnav-pill-dot"></div>Markets Open 24/7</div>
+      <button class="btn btn-outline btn-sm" onclick="showAuth()">Log In</button>
+      <button class="btn btn-primary btn-sm" onclick="showAuth()">Get Started Free →</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="lhero">
+    <div class="lhero-bg"></div>
+    <div class="lhero-grid"></div>
+    <div class="lhero-badge">
+      <span style="width:7px;height:7px;border-radius:50%;background:var(--blue);display:inline-block;animation:pulse 2s infinite"></span>
+      Now Live — Institutional Grade Trading Platform
+    </div>
+    <h1 class="lhero-title">
+      Trade Crypto Like<br>
+      an <em>Institution</em>
+    </h1>
+    <p class="lhero-sub">
+      Professional derivatives, spot markets, copy trading &amp; yield — all in one platform. Built for serious traders.
+    </p>
+    <div class="lhero-btns">
+      <button class="lbtn lbtn-primary" onclick="showAuth()">
+        🚀 Launch Platform
+      </button>
+      <button class="lbtn lbtn-outline" onclick="demoFromLanding()">
+        ⚡ Try Live Demo
+      </button>
+    </div>
+    <div class="lhero-scroll-hint">Scroll to explore</div>
+  </section>
+
+  <!-- LIVE TICKER -->
+  <div class="lticker" id="l-ticker">
+    <div class="ltick"><span class="ltick-sym">BTC</span><span class="ltick-price mono" id="lt-btc">—</span><span class="ltick-chg" id="lc-btc">—</span></div>
+    <div class="ltick"><span class="ltick-sym">ETH</span><span class="ltick-price mono" id="lt-eth">—</span><span class="ltick-chg" id="lc-eth">—</span></div>
+    <div class="ltick"><span class="ltick-sym">SOL</span><span class="ltick-price mono" id="lt-sol">—</span><span class="ltick-chg" id="lc-sol">—</span></div>
+    <div class="ltick"><span class="ltick-sym">BNB</span><span class="ltick-price mono" id="lt-bnb">—</span><span class="ltick-chg" id="lc-bnb">—</span></div>
+    <div class="ltick"><span class="ltick-sym">XRP</span><span class="ltick-price mono" id="lt-xrp">—</span><span class="ltick-chg" id="lc-xrp">—</span></div>
+    <div class="ltick"><span class="ltick-sym">USDT</span><span class="ltick-price mono" style="color:var(--text3)">$1.0000</span><span class="ltick-chg" style="background:var(--bg2);color:var(--text3)">Stable</span></div>
+  </div>
+
+  <!-- PLATFORM STATS -->
+  <div class="lstats">
+    <div class="lstat"><div class="lstat-val up" id="ls-vol">$4.2B</div><div class="lstat-lbl">24h Trading Volume</div></div>
+    <div class="lstat"><div class="lstat-val" style="color:var(--blue)">120K+</div><div class="lstat-lbl">Active Traders Worldwide</div></div>
+    <div class="lstat"><div class="lstat-val" style="color:var(--purple)">200+</div><div class="lstat-lbl">Trading Pairs</div></div>
+    <div class="lstat"><div class="lstat-val" style="color:var(--amber)">99.98%</div><div class="lstat-lbl">Platform Uptime</div></div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="lfeatures" id="features">
+    <div class="lsec-label">Everything You Need</div>
+    <h2 class="lsec-title">Built for <em style="font-style:normal;color:var(--blue)">Professional</em> Traders</h2>
+    <p class="lsec-sub">From spot to derivatives, copy trading to passive yield — ENSLAYER2 is the only platform you need.</p>
+    <div class="lfeat-grid">
+      <div class="lfeat">
+        <div class="lfeat-glow" style="background:radial-gradient(var(--blue),transparent)"></div>
+        <div class="lfeat-icon" style="background:var(--blue-glow);color:var(--blue)">📈</div>
+        <div class="lfeat-title">Advanced Trading Terminal</div>
+        <div class="lfeat-desc">Professional candlestick charts with EMA indicators, real-time order book depth, market & limit orders, and up to 50x leverage on major pairs.</div>
+        <div class="lfeat-tag" style="background:var(--blue-glow);color:var(--blue)">● Live Order Book</div>
+      </div>
+      <div class="lfeat">
+        <div class="lfeat-glow" style="background:radial-gradient(var(--green),transparent)"></div>
+        <div class="lfeat-icon" style="background:var(--green-dim);color:var(--green)">◎</div>
+        <div class="lfeat-title">Earn Up to 12% APY</div>
+        <div class="lfeat-desc">Stake BTC, ETH, and USDT in institutional yield pools. Flexible and locked options available. Daily interest accrual with full transparency.</div>
+        <div class="lfeat-tag" style="background:var(--green-dim);color:var(--green)">● USDT Flexible Pool</div>
+      </div>
+      <div class="lfeat">
+        <div class="lfeat-glow" style="background:radial-gradient(var(--purple),transparent)"></div>
+        <div class="lfeat-icon" style="background:var(--purple-dim);color:var(--purple)">◑</div>
+        <div class="lfeat-title">Copy Trading</div>
+        <div class="lfeat-desc">Mirror top-performing traders automatically. Follow verified professionals with up to 441% ROI and 81% win rates. Set your allocation and go.</div>
+        <div class="lfeat-tag" style="background:var(--purple-dim);color:var(--purple)">● 6 Verified Masters</div>
+      </div>
+      <div class="lfeat">
+        <div class="lfeat-glow" style="background:radial-gradient(var(--amber),transparent)"></div>
+        <div class="lfeat-icon" style="background:var(--amber-dim);color:var(--amber)">🛡️</div>
+        <div class="lfeat-title">Institutional Security</div>
+        <div class="lfeat-desc">3-layer KYC verification, JWT-secured authentication, encrypted data at rest, and a full admin oversight console for regulatory compliance.</div>
+        <div class="lfeat-tag" style="background:var(--amber-dim);color:var(--amber)">● 3-Step KYC</div>
+      </div>
+      <div class="lfeat">
+        <div class="lfeat-glow" style="background:radial-gradient(#10d97c,transparent)"></div>
+        <div class="lfeat-icon" style="background:var(--green-dim);color:var(--green)">◐</div>
+        <div class="lfeat-title">Multi-Asset Wallet</div>
+        <div class="lfeat-desc">Manage BTC, ETH, SOL, BNB, XRP and USDT in one place. Instant deposits, fast withdrawals with full transaction history and audit trail.</div>
+        <div class="lfeat-tag" style="background:var(--green-dim);color:var(--green)">● 6 Assets Supported</div>
+      </div>
+      <div class="lfeat">
+        <div class="lfeat-glow" style="background:radial-gradient(var(--blue),transparent)"></div>
+        <div class="lfeat-icon" style="background:var(--blue-glow);color:var(--blue)">⚡</div>
+        <div class="lfeat-title">Real-Time Market Data</div>
+        <div class="lfeat-desc">Live prices via CoinGecko API with WebSocket architecture. Sub-second ticker updates, 24h stats, volume data, and spread monitoring.</div>
+        <div class="lfeat-tag" style="background:var(--blue-glow);color:var(--blue)">● CoinGecko Powered</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="lhow" id="howitworks">
+    <div class="lsec-label">Getting Started</div>
+    <h2 class="lsec-title" style="text-align:center">Up &amp; Trading in<br><em style="font-style:normal;color:var(--green)">4 Simple Steps</em></h2>
+    <div class="lhow-steps">
+      <div class="lhow-step active">
+        <div class="lhow-num">1</div>
+        <div class="lhow-step-title">Create Account</div>
+        <div class="lhow-step-desc">Sign up in under 60 seconds. No credit card required. Demo mode available instantly.</div>
+      </div>
+      <div class="lhow-step">
+        <div class="lhow-num">2</div>
+        <div class="lhow-step-title">Complete KYC</div>
+        <div class="lhow-step-desc">Verify your identity with our 3-step process. Unlocks full trading limits and withdrawals.</div>
+      </div>
+      <div class="lhow-step">
+        <div class="lhow-num">3</div>
+        <div class="lhow-step-title">Deposit Funds</div>
+        <div class="lhow-step-desc">Deposit BTC, ETH, USDT or other supported assets directly to your wallet.</div>
+      </div>
+      <div class="lhow-step">
+        <div class="lhow-num">4</div>
+        <div class="lhow-step-title">Start Trading</div>
+        <div class="lhow-step-desc">Trade spot & derivatives, copy top traders, or earn yield on your holdings.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EARN SECTION -->
+  <section id="earn-sec" style="padding:80px 48px;border-top:1px solid var(--border)">
+    <div class="lsec-label">Passive Income</div>
+    <h2 class="lsec-title">Make Your Crypto <em style="font-style:normal;color:var(--green)">Work for You</em></h2>
+    <p class="lsec-sub">Institutional staking pools with transparent APY rates. Withdraw anytime on flexible plans.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:860px;margin:0 auto">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;text-align:center;border-top:2px solid #f7931a">
+        <div class="wc-icon ci-btc" style="width:52px;height:52px;border-radius:12px;font-size:20px;margin:0 auto 16px">₿</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px">Bitcoin</div>
+        <div style="font-family:var(--mono);font-size:36px;font-weight:700;background:linear-gradient(135deg,var(--green),#60efb0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">4.2%</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:16px">APY · 30-day lock</div>
+        <button class="btn btn-outline btn-sm btn-full" onclick="showAuth()">Stake BTC</button>
+      </div>
+      <div style="background:linear-gradient(145deg,var(--card),var(--card-hi));border:1px solid var(--blue);border-radius:14px;padding:28px;text-align:center;border-top:2px solid var(--blue);position:relative">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px">MOST POPULAR</div>
+        <div class="wc-icon ci-usdt" style="width:52px;height:52px;border-radius:12px;font-size:20px;margin:0 auto 16px">$</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px">USDT</div>
+        <div style="font-family:var(--mono);font-size:36px;font-weight:700;background:linear-gradient(135deg,var(--green),#60efb0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">12%</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:16px">APY · Flexible</div>
+        <button class="btn btn-primary btn-sm btn-full" onclick="showAuth()">Stake USDT</button>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;text-align:center;border-top:2px solid #627eea">
+        <div class="wc-icon ci-eth" style="width:52px;height:52px;border-radius:12px;font-size:20px;margin:0 auto 16px">Ξ</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px">Ethereum</div>
+        <div style="font-family:var(--mono);font-size:36px;font-weight:700;background:linear-gradient(135deg,var(--green),#60efb0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">5.8%</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:16px">APY · 14-day lock</div>
+        <button class="btn btn-outline btn-sm btn-full" onclick="showAuth()">Stake ETH</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="ltestimonials" id="testimonials">
+    <div class="lsec-label">Trader Reviews</div>
+    <h2 class="lsec-title">Trusted by <em style="font-style:normal;color:var(--purple)">120,000+</em> Traders</h2>
+    <p class="lsec-sub">What professional traders say about the ENSLAYER2 platform.</p>
+    <div class="ltesti-grid">
+      <div class="ltesti">
+        <div class="ltesti-stars">★★★★★</div>
+        <div class="ltesti-quote">"The order execution speed is genuinely institutional. I've traded on Binance, Bybit, OKX — the latency here is comparable and the UI is miles ahead."</div>
+        <div class="ltesti-author">
+          <div class="ltesti-avatar ci-btc">YT</div>
+          <div><div class="ltesti-name">Yuki Tanaka</div><div class="ltesti-role">Professional Trader · Tokyo 🇯🇵</div></div>
+        </div>
+      </div>
+      <div class="ltesti">
+        <div class="ltesti-stars">★★★★★</div>
+        <div class="ltesti-quote">"The copy trading feature is exceptional. I follow AlphaWhale and GridMaster, and my portfolio is up 38% in 3 months without touching a single trade manually."</div>
+        <div class="ltesti-author">
+          <div class="ltesti-avatar ci-eth">OA</div>
+          <div><div class="ltesti-name">Omar Al Farsi</div><div class="ltesti-role">Investor · Dubai 🇦🇪</div></div>
+        </div>
+      </div>
+      <div class="ltesti">
+        <div class="ltesti-stars">★★★★★</div>
+        <div class="ltesti-quote">"The 12% USDT staking pool is what got me in. Now I'm actively trading and using the earn feature. KYC was smooth and fast — verified in under 24h."</div>
+        <div class="ltesti-author">
+          <div class="ltesti-avatar ci-sol">PK</div>
+          <div><div class="ltesti-name">Priya Kumar</div><div class="ltesti-role">DeFi Strategist · Singapore 🇸🇬</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <div class="lcta">
+    <h2 class="lcta-title">Ready to Trade Like a Pro?</h2>
+    <p class="lcta-sub">Join 120,000+ traders already using ENSLAYER2. Free account, demo mode included.</p>
+    <div class="lcta-btns">
+      <button class="lbtn lbtn-primary" onclick="showAuth()">🚀 Create Free Account</button>
+      <button class="lbtn lbtn-outline" onclick="demoFromLanding()">⚡ Try Demo First</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="lfooter">
+      <div class="lfoot-brand">
+        <div class="logo">EN<span>SLAYER</span>2</div>
+        <p>Institutional-grade cryptocurrency trading platform. Built for professionals, accessible to all.</p>
+        <div class="lfoot-socials">
+          <div class="lfoot-social" title="Twitter">𝕏</div>
+          <div class="lfoot-social" title="Telegram">✈</div>
+          <div class="lfoot-social" title="Discord">◈</div>
+          <div class="lfoot-social" title="GitHub">⬡</div>
+        </div>
+      </div>
+      <div>
+        <div class="lfoot-col-title">Platform</div>
+        <a class="lfoot-link" onclick="showAuth()">Trade</a>
+        <a class="lfoot-link" onclick="showAuth()">Earn & Staking</a>
+        <a class="lfoot-link" onclick="showAuth()">Copy Trading</a>
+        <a class="lfoot-link" onclick="showAuth()">Wallet</a>
+        <a class="lfoot-link" onclick="showAuth()">API Access</a>
+      </div>
+      <div>
+        <div class="lfoot-col-title">Company</div>
+        <a class="lfoot-link" href="#">About Us</a>
+        <a class="lfoot-link" href="#">Careers</a>
+        <a class="lfoot-link" href="#">Blog</a>
+        <a class="lfoot-link" href="#">Press Kit</a>
+        <a class="lfoot-link" href="#">Contact</a>
+      </div>
+      <div>
+        <div class="lfoot-col-title">Legal</div>
+        <a class="lfoot-link" href="#">Terms of Service</a>
+        <a class="lfoot-link" href="#">Privacy Policy</a>
+        <a class="lfoot-link" href="#">Cookie Policy</a>
+        <a class="lfoot-link" href="#">AML Policy</a>
+        <a class="lfoot-link" href="#">Risk Disclosure</a>
+      </div>
+    </div>
+    <div class="lfooter-bottom">
+      <div>© 2026 ENSLAYER2 Professional. All rights reserved. Trading crypto involves substantial risk.</div>
+      <div style="display:flex;gap:20px">
+        <a href="#">Terms</a>
+        <a href="#">Privacy</a>
+        <a href="#">Cookies</a>
+        <a href="#">enslayer2.com</a>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /landing -->
+
+<!-- ═══════════════════════ AUTH ═══════════════════════ -->
+<div id="auth" style="display:none">
+  <div class="auth-bg"></div>
+  <div class="auth-grid"></div>
+  <div class="auth-wrap">
+    <div class="auth-hero">
+      <div>
+        <div class="auth-hero-logo">EN<span>SLAYER</span>2</div>
+        <div class="auth-badge" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;background:rgba(16,217,124,.1);border:1px solid rgba(16,217,124,.2);border-radius:5px;padding:3px 9px;font-size:10px;color:var(--green);font-weight:600">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite"></span>
+          Markets Open
+        </div>
+      </div>
+      <div class="auth-hero-main">
+        <div class="auth-hero-title">Institutional<br>Grade <em>Crypto</em><br>Trading</div>
+        <div class="auth-hero-sub" style="margin-top:14px">Professional derivatives, spot trading, copy trading & yield generation — all in one platform.</div>
+      </div>
+      <div class="auth-stats">
+        <div class="auth-stat"><div class="val">$4.2B</div><div class="lbl">Daily Volume</div></div>
+        <div class="auth-stat"><div class="val">120K+</div><div class="lbl">Active Traders</div></div>
+        <div class="auth-stat"><div class="val">50x</div><div class="lbl">Max Leverage</div></div>
+        <div class="auth-stat"><div class="val">12%</div><div class="lbl">Max APY Earn</div></div>
+      </div>
+    </div>
+    <div class="auth-form-area">
+      <div class="auth-form-title">Welcome Back</div>
+      <div class="auth-form-sub">Access your trading dashboard · <a onclick="showLanding()" style="color:var(--blue);cursor:pointer;font-size:12px">← Back to home</a></div>
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="authTab('login')">Sign In</div>
+        <div class="auth-tab" onclick="authTab('register')">Create Account</div>
+      </div>
+      <div id="f-login">
+        <div class="fg"><label>Email Address</label><input id="li-email" type="email" placeholder="you@enslayer2.com"></div>
+        <div class="fg"><label>Password <a>Forgot?</a></label><input id="li-pass" type="password" placeholder="••••••••"></div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()" style="margin-bottom:14px">Sign In →</button>
+        <div class="auth-sep">quick access</div>
+        <div class="demo-btns">
+          <div class="demo-btn" onclick="demoLogin()"><span class="ico">⚡</span>Demo Trader</div>
+          <div class="demo-btn" onclick="adminLogin()"><span class="ico">🛡️</span>Admin Panel</div>
+        </div>
+      </div>
+      <div id="f-register" style="display:none">
+        <div class="fg"><label>Full Name</label><input id="rg-name" placeholder="Satoshi Nakamoto"></div>
+        <div class="fg"><label>Email Address</label><input id="rg-email" type="email" placeholder="you@enslayer2.com"></div>
+        <div class="fg"><label>Password</label><input id="rg-pass" type="password" placeholder="Min 8 characters"></div>
+        <button class="btn btn-primary btn-full" onclick="doRegister()">Create Account →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ APP ═══════════════════════ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-inner">
+        <div class="sb-logo-icon">E2</div>
+        <div><div class="sb-logo-text">EN<span>SLAYER</span>2</div><div class="sb-logo-ver">PROFESSIONAL</div></div>
+      </div>
+    </div>
+    <div class="sb-scroll">
+      <div class="sb-section">Markets</div>
+      <div class="sb-item active" onclick="go('dashboard')"><div class="sb-icon">◈</div>Dashboard</div>
+      <div class="sb-item" onclick="go('trade')"><div class="sb-icon">📈</div>Trade<span class="sb-badge-new">Live</span></div>
+      <div class="sb-section">Finance</div>
+      <div class="sb-item" onclick="go('wallet')"><div class="sb-icon">◐</div>Wallet</div>
+      <div class="sb-item" onclick="go('earn')"><div class="sb-icon">◎</div>Earn</div>
+      <div class="sb-item" onclick="go('copy')"><div class="sb-icon">◑</div>Copy Trading</div>
+      <div class="sb-section">Account</div>
+      <div class="sb-item" onclick="go('kyc')"><div class="sb-icon">◉</div>KYC Verification<span class="sb-badge" id="kyc-dot" style="display:none">!</span></div>
+      <div class="sb-item" id="admin-link" style="display:none" onclick="go('admin')"><div class="sb-icon">⬡</div>Admin</div>
+    </div>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar" id="sb-av">?</div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-name">—</div>
+          <div class="sb-user-role" id="sb-role">Trader</div>
+        </div>
+        <div class="sb-logout" onclick="logout()" title="Logout">⏻</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main-area">
+    <!-- Ticker -->
+    <div id="ticker">
+      <div class="tick-item"><span class="tick-sym">BTC</span><span class="tick-price mono" id="tk-btc">—</span><span class="tick-chg" id="tc-btc">—</span></div>
+      <div class="tick-item"><span class="tick-sym">ETH</span><span class="tick-price mono" id="tk-eth">—</span><span class="tick-chg" id="tc-eth">—</span></div>
+      <div class="tick-item"><span class="tick-sym">SOL</span><span class="tick-price mono" id="tk-sol">—</span><span class="tick-chg" id="tc-sol">—</span></div>
+      <div class="tick-item"><span class="tick-sym">BNB</span><span class="tick-price mono" id="tk-bnb">—</span><span class="tick-chg" id="tc-bnb">—</span></div>
+      <div class="tick-item"><span class="tick-sym">XRP</span><span class="tick-price mono" id="tk-xrp">—</span><span class="tick-chg" id="tc-xrp">—</span></div>
+      <div class="tick-item" style="border-right:none"><span class="tick-sym">USDT</span><span class="tick-price mono" style="color:var(--text3)">1.0000</span><span class="tick-chg" style="background:var(--bg2);color:var(--text3)">Stable</span></div>
+    </div>
+
+    <div id="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div id="page-dashboard" class="page active">
+        <div class="ph">
+          <div>
+            <div class="ph-title" id="dash-greet">Good day, Trader</div>
+            <div class="ph-sub">Here's your portfolio overview</div>
+          </div>
+          <div class="ph-right">
+            <button class="btn btn-outline btn-sm" onclick="openModal('deposit-modal')">⬇ Deposit</button>
+            <button class="btn btn-primary btn-sm" onclick="go('trade')">Trade Now →</button>
+          </div>
+        </div>
+        <div class="dash-grid">
+          <!-- Portfolio Hero -->
+          <div class="pf-hero">
+            <div class="pf-hero-grid">
+              <div>
+                <div class="pf-label">Total Portfolio Value</div>
+                <div class="pf-value" id="pf-val">$0.00</div>
+                <div class="pf-badge" id="pf-chg">+$0.00 (0.00%)</div>
+              </div>
+              <div class="pf-actions">
+                <button class="btn btn-ghost btn-sm" onclick="go('wallet')">⬇ Deposit</button>
+                <button class="btn btn-primary btn-sm" onclick="go('trade')">Trade →</button>
+              </div>
+            </div>
+            <div class="pf-metrics">
+              <div class="pf-metric"><div class="mk">Available</div><div class="mv mono" id="pf-avail">$0.00</div></div>
+              <div class="pf-metric"><div class="mk">Unrealized P&L</div><div class="mv mono" id="pf-upnl">$0.00</div></div>
+              <div class="pf-metric"><div class="mk">Total Trades</div><div class="mv mono" id="pf-trades">0</div></div>
+              <div class="pf-metric"><div class="mk">Win Rate</div><div class="mv mono" id="pf-wr">—</div></div>
+            </div>
+          </div>
+          <!-- Activity Feed -->
+          <div class="activity-feed">
+            <div class="af-header">
+              <div class="af-title">Market Activity</div>
+              <div class="af-live"><span class="af-dot"></span>Live</div>
+            </div>
+            <div class="af-body" id="af-body"></div>
+          </div>
+          <!-- Allocation -->
+          <div class="alloc-card">
+            <div class="card-title">Portfolio Allocation</div>
+            <div class="alloc-list" id="alloc-list"></div>
+          </div>
+          <!-- Open Positions -->
+          <div class="positions-mini">
+            <div class="card-title">Open Positions <span id="pos-ct" style="font-family:var(--mono);color:var(--blue)">0</span></div>
+            <div id="pos-mini-list"></div>
+          </div>
+        </div>
+        <div class="stat-row c4" style="margin-top:14px">
+          <div class="sc"><div class="sc-label">24h P&L <div class="sc-icon ci-btc">₿</div></div><div class="sc-val" id="s-pnl">$0.00</div><div class="sc-sub">from open positions</div></div>
+          <div class="sc"><div class="sc-label">Staked Value <div class="sc-icon ci-eth" style="font-size:12px">Ξ</div></div><div class="sc-val" id="s-staked">$0.00</div><div class="sc-sub">earning daily yield</div></div>
+          <div class="sc"><div class="sc-label">Copy Trading <div class="sc-icon ci-usdt">$</div></div><div class="sc-val" id="s-copy">$0.00</div><div class="sc-sub" id="s-copy-sub">0 traders followed</div></div>
+          <div class="sc"><div class="sc-label">KYC Status <div class="sc-icon" id="s-kyc-icon" style="background:var(--amber-dim);font-size:13px">⏳</div></div><div class="sc-val" id="s-kyc" style="font-size:16px">Pending</div><div class="sc-sub" id="s-kyc-sub">Complete to unlock</div></div>
+        </div>
+      </div>
+
+      <!-- ═══ TRADE ═══ -->
+      <div id="page-trade" class="page">
+        <div class="trade-topbar">
+          <div class="pair-switcher" id="pair-switcher"></div>
+          <div class="trade-meta">
+            <div style="display:flex;align-items:baseline;gap:8px">
+              <div class="tm-price" id="tm-price">—</div>
+              <div class="tm-chg" id="tm-chg">—</div>
+            </div>
+            <div class="tm-stat"><div class="k">24h High</div><div class="v up" id="tm-high">—</div></div>
+            <div class="tm-stat"><div class="k">24h Low</div><div class="v down" id="tm-low">—</div></div>
+            <div class="tm-stat"><div class="k">24h Volume</div><div class="v muted" id="tm-vol">—</div></div>
+            <div class="tm-stat"><div class="k">24h Trades</div><div class="v muted" id="tm-trades">—</div></div>
+          </div>
+        </div>
+        <div class="trade-body">
+          <div class="chart-pane">
+            <div class="chart-tools">
+              <button class="tf-btn" onclick="setTF('1H',this)">1H</button>
+              <button class="tf-btn" onclick="setTF('4H',this)">4H</button>
+              <button class="tf-btn active" onclick="setTF('1D',this)">1D</button>
+              <button class="tf-btn" onclick="setTF('1W',this)">1W</button>
+              <div class="ct-sep"></div>
+              <div class="ct-legend">
+                <span><span class="ct-dot" style="background:#3b7eff"></span> EMA20</span>
+                <span><span class="ct-dot" style="background:#f59e0b"></span> EMA50</span>
+                <span><span class="ct-dot" style="background:#a855f7"></span> EMA100</span>
+              </div>
+            </div>
+            <canvas id="chart"></canvas>
+          </div>
+          <div class="order-pane">
+            <div class="ob-wrap">
+              <div class="ob-title"><span>Order Book</span><span class="mono" style="font-size:9px;color:var(--text3)">BTC/USDT</span></div>
+              <div class="ob-hdr"><span>Price</span><span style="text-align:right">Size</span><span style="text-align:right">Total</span></div>
+              <div id="ob-asks"></div>
+              <div class="ob-spread" id="ob-spread">—</div>
+              <div id="ob-bids"></div>
+            </div>
+            <div class="of-wrap">
+              <div class="side-row">
+                <button class="side-btn buy active" id="btn-buy" onclick="setSide('buy')">Buy / Long</button>
+                <button class="side-btn sell" id="btn-sell" onclick="setSide('sell')">Sell / Short</button>
+              </div>
+              <div class="ot-row">
+                <button class="ot-btn active" onclick="setOT('market',this)">Market</button>
+                <button class="ot-btn" onclick="setOT('limit',this)">Limit</button>
+                <button class="ot-btn" onclick="setOT('stop',this)">Stop</button>
+              </div>
+              <div class="of-group" id="g-limit" style="display:none">
+                <div class="of-label">Limit Price <span class="of-unit-lbl">USDT</span></div>
+                <div class="of-input-wrap"><input type="number" id="ip-limit" placeholder="0.00"><span class="of-unit">USDT</span></div>
+              </div>
+              <div class="of-group">
+                <div class="of-label">Amount <span class="bal mono" id="bal-disp">Bal: $0.00</span></div>
+                <div class="of-input-wrap"><input type="number" id="ip-amount" oninput="calcOrder()" placeholder="0.00"><span class="of-unit">USDT</span></div>
+              </div>
+              <div class="pct-row">
+                <button class="pct-b" onclick="pct(25)">25%</button>
+                <button class="pct-b" onclick="pct(50)">50%</button>
+                <button class="pct-b" onclick="pct(75)">75%</button>
+                <button class="pct-b" onclick="pct(100)">Max</button>
+              </div>
+              <div class="lev-wrap">
+                <div class="lev-label">Leverage <span class="lev-val" id="lev-disp">10x</span></div>
+                <input type="range" min="1" max="50" value="10" id="lev-slider" oninput="setLev(this.value)">
+                <div class="lev-marks"><span>1x</span><span>10x</span><span>25x</span><span>50x</span></div>
+              </div>
+              <div class="order-summary">
+                <div class="os-row"><span class="k">Order Value</span><span class="v" id="os-val">—</span></div>
+                <div class="os-row"><span class="k">Margin Required</span><span class="v" id="os-margin">—</span></div>
+                <div class="os-row"><span class="k">Est. Liquidation</span><span class="v down" id="os-liq">—</span></div>
+                <div class="os-row"><span class="k">Trading Fee (0.04%)</span><span class="v" id="os-fee">—</span></div>
+              </div>
+              <button class="submit-btn buy" id="submit-btn" onclick="placeOrder()">Buy / Long BTC</button>
+            </div>
+          </div>
+        </div>
+        <div class="trade-footer">
+          <div class="tf-tabs">
+            <div class="tf-tab active" onclick="ftab('positions',this)">Positions (<span id="pc">0</span>)</div>
+            <div class="tf-tab" onclick="ftab('orders',this)">Open Orders (<span id="oc">0</span>)</div>
+            <div class="tf-tab" onclick="ftab('history',this)">Trade History</div>
+          </div>
+          <div class="pos-table-wrap" id="ftab-body"></div>
+        </div>
+      </div>
+
+      <!-- ═══ WALLET ═══ -->
+      <div id="page-wallet" class="page" style="display:none">
+        <div class="ph">
+          <div><div class="ph-title">Wallet</div><div class="ph-sub">Manage and track all your assets</div></div>
+          <div class="ph-right">
+            <button class="btn btn-outline btn-sm" onclick="openModal('wd-modal')">⬆ Withdraw</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal('deposit-modal')">⬇ Deposit</button>
+          </div>
+        </div>
+        <div class="wallet-hero">
+          <div class="wallet-total-lbl">Total Portfolio Value</div>
+          <div class="wallet-total mono" id="w-total">$0.00</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+            <span class="tag tag-green" id="w-chg">+0.00%</span>
+            <span style="font-size:12px;color:var(--text2)">24h change</span>
+          </div>
+        </div>
+        <div class="wallet-grid" id="wallet-grid"></div>
+        <div class="card">
+          <div class="card-title">Transaction History</div>
+          <div class="tx-table-wrap">
+            <table><thead><tr><th>Date & Time</th><th>Type</th><th>Asset</th><th>Amount</th><th>USD Value</th><th>Status</th></tr></thead>
+            <tbody id="tx-body"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ EARN ═══ -->
+      <div id="page-earn" class="page" style="display:none">
+        <div class="ph">
+          <div><div class="ph-title">Earn</div><div class="ph-sub">Stake assets and earn passive yield</div></div>
+        </div>
+        <div class="earn-hero">
+          <div class="earn-hero-title">Earn up to <em>12% APY</em></div>
+          <div class="earn-hero-sub">Stake your idle assets and earn daily interest. No lock-up required for USDT. Withdraw anytime.</div>
+          <div class="earn-summary-grid" style="margin-top:20px;max-width:500px">
+            <div class="es-item"><div class="ek">Total Staked</div><div class="ev" id="e-total">$0.00</div></div>
+            <div class="es-item"><div class="ek">Daily Earnings</div><div class="ev up" id="e-daily">$0.0000</div></div>
+            <div class="es-item"><div class="ek">All-Time Earned</div><div class="ev up" id="e-alltime">$0.0000</div></div>
+          </div>
+        </div>
+        <div class="stake-grid" id="stake-grid"></div>
+      </div>
+
+      <!-- ═══ COPY TRADING ═══ -->
+      <div id="page-copy" class="page" style="display:none">
+        <div class="ph">
+          <div><div class="ph-title">Copy Trading</div><div class="ph-sub">Mirror top-performing traders automatically</div></div>
+        </div>
+        <div class="copy-hero">
+          <div style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:20px">
+            <div>
+              <div style="font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px">Follow the Best.<br>Trade <span style="color:var(--purple)">Automatically.</span></div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.7;max-width:480px">Copy trades from verified professional traders in real-time. Set your allocation, sit back, and let the pros work for you.</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;min-width:260px">
+              <div class="auth-stat"><div class="val" id="cp-following">0</div><div class="lbl">Following</div></div>
+              <div class="auth-stat"><div class="val up" id="cp-pnl">$0.00</div><div class="lbl">Copy P&L</div></div>
+              <div class="auth-stat"><div class="val" id="cp-capital">$0.00</div><div class="lbl">Allocated</div></div>
+              <div class="auth-stat"><div class="val">6</div><div class="lbl">Top Traders</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="trader-grid" id="trader-grid"></div>
+      </div>
+
+      <!-- ═══ KYC ═══ -->
+      <div id="page-kyc" class="page" style="display:none">
+        <div class="ph">
+          <div><div class="ph-title">KYC Verification</div><div class="ph-sub">Verify your identity to unlock full trading capabilities</div></div>
+          <div id="kyc-status-area"></div>
+        </div>
+        <div class="kyc-layout">
+          <div>
+            <div class="kyc-sidebar" id="kyc-steps-sidebar"></div>
+            <div class="card" style="margin-top:14px">
+              <div class="card-title">What You Unlock</div>
+              <div class="kyc-benefit"><span class="ico">📈</span><span>Unlimited trading volume</span></div>
+              <div class="kyc-benefit"><span class="ico">⬆</span><span>Withdrawal up to $500K/day</span></div>
+              <div class="kyc-benefit"><span class="ico">🏦</span><span>Bank wire deposits</span></div>
+              <div class="kyc-benefit"><span class="ico">📊</span><span>Leverage up to 50x</span></div>
+              <div class="kyc-benefit"><span class="ico">💎</span><span>VIP fee tiers</span></div>
+            </div>
+          </div>
+          <div class="kyc-main">
+            <!-- Step 1 -->
+            <div class="kyc-pane active" id="kyc-p1">
+              <div class="kyc-pane-title">Personal Information</div>
+              <div class="kyc-pane-sub">Tell us about yourself. This information will be kept strictly confidential.</div>
+              <div class="kyc-limits">
+                <div class="kyc-limits-title">Your current limits</div>
+                <div class="kyc-limit-row"><span class="lk">Daily Withdrawal</span><span class="lv locked">$2,000</span></div>
+                <div class="kyc-limit-row"><span class="lk">24h Trading Volume</span><span class="lv locked">$10,000</span></div>
+                <div class="kyc-limit-row"><span class="lk">Leverage</span><span class="lv locked">10x max</span></div>
+              </div>
+              <div class="grid2">
+                <div class="fg"><label>First Name</label><input id="k-fname" placeholder="John"></div>
+                <div class="fg"><label>Last Name</label><input id="k-lname" placeholder="Smith"></div>
+              </div>
+              <div class="grid2">
+                <div class="fg"><label>Date of Birth</label><input id="k-dob" type="date"></div>
+                <div class="fg"><label>Nationality</label><select id="k-nat"><option value="">Select country...</option><option>United Arab Emirates</option><option>United States</option><option>United Kingdom</option><option>India</option><option>Germany</option><option>France</option><option>Singapore</option><option>Japan</option><option>South Korea</option><option>Other</option></select></div>
+              </div>
+              <div class="fg"><label>Residential Address</label><input id="k-addr" placeholder="Street, City, Country"></div>
+              <div class="grid2">
+                <div class="fg"><label>Phone Number</label><input id="k-phone" placeholder="+971 50 000 0000"></div>
+                <div class="fg"><label>Occupation</label><select id="k-occ"><option>Individual Trader</option><option>Finance Professional</option><option>Software Engineer</option><option>Business Owner</option><option>Other</option></select></div>
+              </div>
+              <div class="kyc-footer">
+                <button class="btn btn-primary" onclick="kycNext(1)">Continue: Identity →</button>
+              </div>
+            </div>
+            <!-- Step 2 -->
+            <div class="kyc-pane" id="kyc-p2">
+              <div class="kyc-pane-title">Identity Verification</div>
+              <div class="kyc-pane-sub">Provide your government-issued identification details.</div>
+              <div class="fg"><label>Document Type</label><select id="k-dtype"><option>Passport</option><option>National ID Card</option><option>Driver's License</option><option>Residence Permit</option></select></div>
+              <div class="grid2">
+                <div class="fg"><label>Document Number</label><input id="k-dnum" placeholder="A12345678"></div>
+                <div class="fg"><label>Expiry Date</label><input id="k-exp" type="date"></div>
+              </div>
+              <div class="grid2">
+                <div class="fg"><label>Issuing Country</label><select id="k-country"><option>United Arab Emirates</option><option>United States</option><option>United Kingdom</option><option>India</option><option>Germany</option><option>Singapore</option></select></div>
+                <div class="fg"><label>Source of Funds</label><select id="k-sof"><option>Employment / Salary</option><option>Trading & Investments</option><option>Business Income</option><option>Inheritance</option><option>Other</option></select></div>
+              </div>
+              <div class="kyc-footer">
+                <button class="btn btn-ghost" onclick="kycPrev(2)">← Back</button>
+                <button class="btn btn-primary" onclick="kycNext(2)">Continue: Documents →</button>
+              </div>
+            </div>
+            <!-- Step 3 -->
+            <div class="kyc-pane" id="kyc-p3">
+              <div class="kyc-pane-title">Document Upload</div>
+              <div class="kyc-pane-sub">Upload clear photos of your documents. All images are encrypted and stored securely.</div>
+              <div class="grid2" style="margin-bottom:12px">
+                <div>
+                  <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Front of Document</div>
+                  <div class="upload-zone" id="uz-front" onclick="fakeUpload('front')">
+                    <div class="upload-ico" id="ui-front">📄</div>
+                    <div class="upload-title" id="ut-front">Click to upload</div>
+                    <div class="upload-sub">JPG, PNG or PDF · Max 10MB</div>
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Back of Document</div>
+                  <div class="upload-zone" id="uz-back" onclick="fakeUpload('back')">
+                    <div class="upload-ico" id="ui-back">📄</div>
+                    <div class="upload-title" id="ut-back">Click to upload</div>
+                    <div class="upload-sub">JPG, PNG or PDF · Max 10MB</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Selfie with Document</div>
+                <div class="upload-zone" id="uz-selfie" onclick="fakeUpload('selfie')">
+                  <div class="upload-ico" id="ui-selfie">🤳</div>
+                  <div class="upload-title" id="ut-selfie">Take or upload a selfie holding your document</div>
+                  <div class="upload-sub">Hold document next to your face · Good lighting required</div>
+                </div>
+              </div>
+              <div class="kyc-footer">
+                <button class="btn btn-ghost" onclick="kycPrev(3)">← Back</button>
+                <button class="btn btn-primary" onclick="submitKYC()">Submit for Review</button>
+              </div>
+            </div>
+            <!-- Done -->
+            <div class="kyc-pane" id="kyc-done">
+              <div style="padding:40px;text-align:center">
+                <div style="font-size:48px;margin-bottom:16px">⏳</div>
+                <div style="font-size:20px;font-weight:700;margin-bottom:8px">Submitted for Review</div>
+                <div style="font-size:13px;color:var(--text2);max-width:360px;margin:0 auto;line-height:1.7">Your documents are being reviewed by our compliance team. This typically takes 1–2 business days. We'll notify you via email once verified.</div>
+                <div class="kyc-alert pending" style="margin-top:24px;text-align:left">
+                  <span style="font-size:20px">⏳</span>
+                  <div><div style="font-weight:700">Under Review</div><div style="font-size:12px;margin-top:2px">Submitted on {{date}}. Expected completion: 1–2 business days.</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ADMIN ═══ -->
+      <div id="page-admin" class="page" style="display:none">
+        <div class="admin-banner">
+          <div class="ab-left">
+            <div class="ab-icon">🛡️</div>
+            <div>
+              <div class="ab-title">Admin Control Panel</div>
+              <div class="ab-sub">Full platform management and oversight</div>
+            </div>
+          </div>
+          <div class="ab-badge">🛡️ Administrator Access</div>
+        </div>
+        <div class="stat-row c4" style="margin-bottom:20px">
+          <div class="sc"><div class="sc-label">Total Users <div class="sc-icon" style="background:var(--blue-glow);font-size:16px">👥</div></div><div class="sc-val">2,847</div><div class="sc-sub"><span class="badge up">+12 today</span></div></div>
+          <div class="sc"><div class="sc-label">Platform Volume <div class="sc-icon" style="background:var(--green-dim);font-size:16px">📊</div></div><div class="sc-val">$4.2M</div><div class="sc-sub"><span class="badge up">+18.4% 24h</span></div></div>
+          <div class="sc"><div class="sc-label">Revenue (24h) <div class="sc-icon" style="background:var(--purple-dim);font-size:16px">💰</div></div><div class="sc-val">$8,420</div><div class="sc-sub"><span class="badge up">+22.1%</span></div></div>
+          <div class="sc"><div class="sc-label">KYC Pending <div class="sc-icon" style="background:var(--amber-dim);font-size:16px">📋</div></div><div class="sc-val" style="color:var(--amber)">34</div><div class="sc-sub">Needs manual review</div></div>
+        </div>
+        <div class="admin-grid">
+          <div class="card">
+            <div class="card-title">User Management <span style="font-family:var(--mono);color:var(--text3);font-style:normal;letter-spacing:0;text-transform:none;font-size:11px">2,847 total</span></div>
+            <div style="overflow-x:auto">
+              <table><thead><tr><th>User</th><th>Email</th><th>KYC</th><th>Status</th><th>Balance</th><th>Joined</th><th>Actions</th></tr></thead>
+              <tbody id="admin-users"></tbody></table>
+            </div>
+          </div>
+          <div class="platform-health">
+            <div class="card-title">Platform Health</div>
+            <div class="ph-metric"><span style="font-size:12px">API Latency</span><div style="display:flex;align-items:center;gap:8px"><div class="ph-bar-wrap"><div class="ph-bar" style="width:15%;background:var(--green)"></div></div><span class="mono" style="font-size:11px;color:var(--green)">12ms</span></div></div>
+            <div class="ph-metric"><span style="font-size:12px">Server Load</span><div style="display:flex;align-items:center;gap:8px"><div class="ph-bar-wrap"><div class="ph-bar" style="width:42%"></div></div><span class="mono" style="font-size:11px">42%</span></div></div>
+            <div class="ph-metric"><span style="font-size:12px">DB Connections</span><div style="display:flex;align-items:center;gap:8px"><div class="ph-bar-wrap"><div class="ph-bar" style="width:28%"></div></div><span class="mono" style="font-size:11px">28%</span></div></div>
+            <div class="ph-metric"><span style="font-size:12px">WS Sessions</span><div style="display:flex;align-items:center;gap:8px"><div class="ph-bar-wrap"><div class="ph-bar" style="width:61%;background:var(--amber)"></div></div><span class="mono" style="font-size:11px;color:var(--amber)">1,240</span></div></div>
+            <div class="ph-metric"><span style="font-size:12px">Price Feed</span><div style="display:flex;align-items:center;gap:8px"><span class="af-dot" style="animation:pulse 2s infinite"></span><span class="mono" style="font-size:11px;color:var(--green)">Healthy</span></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Audit Log</div>
+          <div id="audit-log"></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-area -->
+</div><!-- /app -->
+
+<!-- MODALS -->
+<div class="overlay" id="deposit-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">⬇ Deposit Assets</div><button class="modal-close" onclick="closeModal('deposit-modal')">✕</button></div>
+    <div class="fg"><label>Select Asset</label><select id="dep-asset"><option value="USDT">USDT — Tether</option><option value="BTC">BTC — Bitcoin</option><option value="ETH">ETH — Ethereum</option><option value="SOL">SOL — Solana</option><option value="BNB">BNB</option></select></div>
+    <div class="fg"><label>Amount</label><div style="position:relative"><input type="number" id="dep-amt" placeholder="0.00" style="padding-right:60px"><span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);font-weight:600" id="dep-unit">USDT</span></div></div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--text2);line-height:1.6">📋 This is a simulated deposit. Funds are credited instantly in demo mode.</div>
+    <button class="btn btn-primary btn-full" onclick="doDeposit()">Confirm Deposit</button>
+  </div>
+</div>
+<div class="overlay" id="wd-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">⬆ Withdraw Assets</div><button class="modal-close" onclick="closeModal('wd-modal')">✕</button></div>
+    <div class="fg"><label>Asset</label><select id="wd-asset"><option value="USDT">USDT</option><option value="BTC">BTC</option><option value="ETH">ETH</option></select></div>
+    <div class="fg"><label>Destination Wallet</label><input id="wd-addr" placeholder="0x... or bc1q..."></div>
+    <div class="fg"><label>Amount</label><input type="number" id="wd-amt" placeholder="0.00"></div>
+    <button class="btn btn-primary btn-full" onclick="doWithdraw()">Confirm Withdrawal</button>
+  </div>
+</div>
+<div class="overlay" id="stake-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title" id="stake-modal-title">Stake</div><button class="modal-close" onclick="closeModal('stake-modal')">✕</button></div>
+    <div id="stake-modal-body"></div>
+    <button class="btn btn-primary btn-full" onclick="doStake()">Confirm</button>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════ */
+const SEED = {BTC:87420,ETH:3210,SOL:148,BNB:412,XRP:0.62};
+const COIN_NAMES = {BTC:'Bitcoin',ETH:'Ethereum',SOL:'Solana',USDT:'Tether USD',BNB:'BNB Chain',XRP:'Ripple'};
+const COIN_FULL = {BTC:'Bitcoin',ETH:'Ethereum',SOL:'Solana',USDT:'Tether',BNB:'BNB',XRP:'Ripple'};
+const COINS = ['USDT','BTC','ETH','SOL','BNB','XRP'];
+
+let S = {
+  user: null,
+  prices: {...SEED, USDT:1},
+  changes: {BTC:0,ETH:0,SOL:0,BNB:0,XRP:0},
+  vols: {BTC:0,ETH:0,SOL:0,BNB:0,XRP:0},
+  portfolio: {BTC:0.1,ETH:1.5,SOL:10,USDT:8500,BNB:0.5,XRP:200},
+  positions: [],
+  orders: [],
+  history: [],
+  staking: {
+    BTC:{staked:0,earned:0,apy:4.2,pool:42800,min:0.001},
+    ETH:{staked:0,earned:0,apy:5.8,pool:18600,min:0.01},
+    USDT:{staked:0,earned:0,apy:12.0,pool:5200000,min:10},
+  },
+  following: [],
+  txns: [],
+  pair: 'BTC',
+  tf: '1D',
+  side: 'buy',
+  ot: 'market',
+  lev: 10,
+  page: 'dashboard',
+  ftab: 'positions',
+  kycStep: 1,
+  kycDone: false,
+  uploads: {front:false,back:false,selfie:false},
+  candles: {},
+  stakeCtx: null,
+  hoverX: null, hoverY: null,
+};
+
+const USERS = {
+  'demo@enslayer2.com': {name:'Alex Chen',role:'user',pass:'demo123',kyc:'pending',av:'AC'},
+  'admin@enslayer2.com': {name:'Admin User',role:'admin',pass:'admin123',kyc:'verified',av:'AD'},
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════════════════════════════════ */
+function showAuth(){
+  document.getElementById('landing').classList.add('hidden');
+  document.getElementById('auth').style.display='flex';
+}
+function showLanding(){
+  document.getElementById('landing').classList.remove('hidden');
+  document.getElementById('auth').style.display='none';
+}
+function demoFromLanding(){
+  showAuth();
+  setTimeout(()=>demoLogin(),100);
+}
+function scrollTo(sel){
+  const el=document.querySelector(sel);
+  if(el) el.scrollIntoView({behavior:'smooth'});
+}
+function updateLandingTicker(){
+  const map={btc:'BTC',eth:'ETH',sol:'SOL',bnb:'BNB',xrp:'XRP'};
+  for(const[k,sym] of Object.entries(map)){
+    const p=S.prices[sym]||SEED[sym]||0,c=S.changes[sym]||0;
+    const pe=document.getElementById('lt-'+k),ce=document.getElementById('lc-'+k);
+    if(pe) pe.textContent=fmtP(p,sym);
+    if(ce){ce.textContent=(c>=0?'+':'')+c.toFixed(2)+'%';ce.className='ltick-chg '+(c>=0?'up':'down');}
+  }
+}
+// Fetch prices on landing load too
+fetchLandingPrices();
+async function fetchLandingPrices(){
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin,ripple&vs_currencies=usd&include_24hr_change=true');
+    const d=await r.json();
+    const map={bitcoin:'BTC',ethereum:'ETH',solana:'SOL',binancecoin:'BNB',ripple:'XRP'};
+    for(const[id,sym] of Object.entries(map)){
+      if(d[id]){S.prices[sym]=d[id].usd;S.changes[sym]=d[id].usd_24h_change||0;}
+    }
+  }catch(e){
+    for(const sym of ['BTC','ETH','SOL','BNB','XRP']){
+      if(!S.prices[sym]) S.prices[sym]=SEED[sym];
+      S.changes[sym]=(Math.random()-.45)*6;
+    }
+  }
+  updateLandingTicker();
+  updateTicker();
+}
+setInterval(fetchLandingPrices,30000);
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════════════════════ */
+function authTab(t) {
+  document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='register')));
+  document.getElementById('f-login').style.display = t==='login'?'block':'none';
+  document.getElementById('f-register').style.display = t==='register'?'block':'none';
+}
+function doLogin() {
+  const e=v('li-email'),p=v('li-pass');
+  const u=USERS[e];
+  if(!u||u.pass!==p) return toast('Invalid credentials','error','Wrong email or password');
+  loginAs(e,u);
+}
+function demoLogin(){ loginAs('demo@enslayer2.com',USERS['demo@enslayer2.com']); }
+function adminLogin(){ loginAs('admin@enslayer2.com',USERS['admin@enslayer2.com']); }
+function doRegister() {
+  const name=v('rg-name'),email=v('rg-email'),pass=v('rg-pass');
+  if(!name||!email||pass.length<8) return toast('Validation Error','error','Fill all fields. Password ≥ 8 chars.');
+  const av=name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  USERS[email]={name,role:'user',pass,kyc:'none',av};
+  loginAs(email,USERS[email]);
+}
+function loginAs(email,u) {
+  S.user={...u,email};
+  S.kycDone = u.kyc!=='none';
+  document.getElementById('auth').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('sb-av').textContent=u.av;
+  document.getElementById('sb-name').textContent=u.name;
+  document.getElementById('sb-role').textContent=u.role==='admin'?'Administrator':'Trader';
+  if(u.role==='admin') document.getElementById('admin-link').style.display='flex';
+  if(u.kyc==='none') document.getElementById('kyc-dot').style.display='inline';
+  initApp();
+}
+function logout() {
+  S.user=null;
+  document.getElementById('app').style.display='none';
+  showLanding();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════════ */
+function go(pg) {
+  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none';});
+  const el=document.getElementById('page-'+pg);
+  if(el){el.style.display='block';setTimeout(()=>el.classList.add('active'),10);}
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  const ni=document.querySelector(`.sb-item[onclick*="${pg}"]`);
+  if(ni) ni.classList.add('active');
+  S.page=pg;
+  if(pg==='dashboard') renderDash();
+  else if(pg==='trade'){el.style.display='flex';setTimeout(initChart,60);}
+  else if(pg==='wallet') renderWallet();
+  else if(pg==='earn') renderEarn();
+  else if(pg==='copy') renderCopy();
+  else if(pg==='kyc') renderKYC();
+  else if(pg==='admin') renderAdmin();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PRICES
+═══════════════════════════════════════════════════════════════ */
+async function fetchPrices() {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin,ripple&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true');
+    const d = await r.json();
+    const map={bitcoin:'BTC',ethereum:'ETH',solana:'SOL',binancecoin:'BNB',ripple:'XRP'};
+    for(const[id,sym] of Object.entries(map)){
+      if(d[id]){S.prices[sym]=d[id].usd;S.changes[sym]=d[id].usd_24h_change||0;S.vols[sym]=d[id].usd_24h_vol||0;}
+    }
+  } catch(e) {
+    for(const sym of ['BTC','ETH','SOL','BNB','XRP']){
+      if(!S.prices[sym]) S.prices[sym]=SEED[sym];
+      S.prices[sym]*=(1+(Math.random()-.5)*.002);
+      S.changes[sym]=(Math.random()-.45)*6;
+    }
+  }
+  updateTicker();
+  if(S.page==='trade'){updateTradeBar();renderOB();}
+  if(S.page==='dashboard') renderDash();
+}
+
+function updateTicker() {
+  const map={btc:'BTC',eth:'ETH',sol:'SOL',bnb:'BNB',xrp:'XRP'};
+  for(const[k,sym] of Object.entries(map)){
+    const p=S.prices[sym], c=S.changes[sym]||0;
+    const pe=document.getElementById('tk-'+k);
+    const ce=document.getElementById('tc-'+k);
+    if(pe) pe.textContent=fmtP(p,sym);
+    if(ce){ce.textContent=(c>=0?'+':'')+c.toFixed(2)+'%';ce.className='tick-chg '+(c>=0?'up':'down');}
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHART
+═══════════════════════════════════════════════════════════════ */
+function genCandles(sym,tf) {
+  const cnt={1:120,4:100,'1D':120,'1W':80}[tf]||120;
+  const base=S.prices[sym]||SEED[sym]||100;
+  const vol={BTC:.025,ETH:.035,SOL:.045,BNB:.025,XRP:.04}[sym]||.03;
+  let p=base*(.72+Math.random()*.2);
+  const arr=[];
+  for(let i=0;i<cnt;i++){
+    const o=p,drift=(Math.random()-.47)*vol;
+    const c=o*(1+drift),h=Math.max(o,c)*(1+Math.random()*vol*.4);
+    const l=Math.min(o,c)*(1-Math.random()*vol*.4);
+    arr.push({o,h,l,c,v:Math.random()*2000000+100000});
+    p=c;
+  }
+  const sc=base/arr[arr.length-1].c;
+  return arr.map(a=>({o:a.o*sc,h:a.h*sc,l:a.l*sc,c:a.c*sc,v:a.v}));
+}
+function ema(data,n){
+  const k=2/(n+1);let prev=data[0].c;
+  return data.map(d=>{prev=d.c*k+prev*(1-k);return prev;});
+}
+
+function initChart(){
+  const cv=document.getElementById('chart');
+  if(!cv||!cv.parentElement) return;
+  const dpr=window.devicePixelRatio||1;
+  cv.width=cv.parentElement.clientWidth*dpr;
+  cv.height=cv.parentElement.clientHeight*dpr;
+  const ctx=cv.getContext('2d');
+  ctx.scale(dpr,dpr);
+  const W=cv.parentElement.clientWidth,H=cv.parentElement.clientHeight;
+  cv._ctx=ctx;cv._W=W;cv._H=H;
+  cv.onmousemove=e=>{const r=cv.getBoundingClientRect();S.hoverX=e.clientX-r.left;S.hoverY=e.clientY-r.top;drawChart();};
+  cv.onmouseleave=()=>{S.hoverX=null;S.hoverY=null;drawChart();};
+  initPairSwitcher();
+  updateTradeBar();
+  renderOB();
+  renderFtab();
+  drawChart();
+}
+
+function drawChart(){
+  const cv=document.getElementById('chart');
+  if(!cv||!cv._ctx) return;
+  const ctx=cv._ctx,W=cv._W,H=cv._H;
+  const sym=S.pair;
+  if(!S.candles[sym]) S.candles[sym]=genCandles(sym,S.tf);
+  const data=S.candles[sym].slice(-100);
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#080c14';ctx.fillRect(0,0,W,H);
+  const PL=58,PR=14,PT=16,VH=52,PB=26+VH;
+  const CH=H-PT-PB,CW=W-PL-PR;
+  const maxP=Math.max(...data.map(d=>d.h))*1.002,minP=Math.min(...data.map(d=>d.l))*.998;
+  const PR2=maxP-minP,maxV=Math.max(...data.map(d=>d.v));
+  const cw=CW/data.length,bw=Math.max(1.5,cw*.6);
+  const toY=p=>PT+CH-((p-minP)/PR2)*CH;
+  const toX=i=>PL+(i+.5)*cw;
+
+  // Grid
+  for(let i=0;i<=5;i++){
+    const y=PT+i*(CH/5);
+    ctx.strokeStyle='rgba(28,42,66,.6)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(PL,y);ctx.lineTo(W-PR,y);ctx.stroke();
+    const price=maxP-(i/5)*PR2;
+    ctx.fillStyle='#4a5f82';ctx.font='10px Geist Mono,monospace';ctx.textAlign='right';
+    ctx.fillText(fmtP(price,sym),PL-5,y+4);
+  }
+  // Vertical grid
+  const vstep=Math.floor(data.length/6);
+  for(let i=0;i<data.length;i+=vstep){
+    const x=toX(i);
+    ctx.strokeStyle='rgba(28,42,66,.3)';ctx.lineWidth=.5;
+    ctx.beginPath();ctx.moveTo(x,PT);ctx.lineTo(x,H-PB);ctx.stroke();
+    ctx.fillStyle='#4a5f82';ctx.font='9px Geist Mono,monospace';ctx.textAlign='center';
+    ctx.fillText(tfLbl(i,data.length,S.tf),x,H-PB+VH+12);
+  }
+  // EMAs
+  const e20=ema(data,20),e50=ema(data,50),e100=ema(data,100);
+  const drawLine=(arr,col,lw=1.5)=>{
+    ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.beginPath();
+    arr.forEach((v,i)=>i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v)));
+    ctx.stroke();
+  };
+  drawLine(e20,'rgba(59,126,255,.8)');
+  drawLine(e50,'rgba(245,158,11,.8)');
+  drawLine(e100,'rgba(168,85,247,.6)');
+  // Volume
+  const vBase=H-PB+2;
+  data.forEach((d,i)=>{
+    const x=toX(i),vh=(d.v/maxV)*(VH-10);
+    ctx.fillStyle=d.c>=d.o?'rgba(16,217,124,.18)':'rgba(255,69,96,.18)';
+    ctx.fillRect(x-bw/2,vBase+VH-10-vh,bw,vh);
+  });
+  // Candles
+  data.forEach((d,i)=>{
+    const x=toX(i),bull=d.c>=d.o;
+    const col=bull?'#10d97c':'#ff4560';
+    ctx.strokeStyle=col;ctx.lineWidth=1;
+    const oy=toY(d.o),cy=toY(d.c),hy=toY(d.h),ly=toY(d.l);
+    ctx.beginPath();ctx.moveTo(x,hy);ctx.lineTo(x,ly);ctx.stroke();
+    const by=Math.min(oy,cy),bh=Math.max(1,Math.abs(cy-oy));
+    if(bull){ctx.fillStyle=col;ctx.fillRect(x-bw/2,by,bw,bh);}
+    else{ctx.fillStyle='rgba(255,69,96,.2)';ctx.fillRect(x-bw/2,by,bw,bh);ctx.strokeStyle=col;ctx.lineWidth=1;ctx.strokeRect(x-bw/2,by,bw,bh);}
+  });
+  // Hover
+  if(S.hoverX&&S.hoverX>PL&&S.hoverX<W-PR){
+    const i=Math.min(data.length-1,Math.max(0,Math.floor((S.hoverX-PL)/cw)));
+    const d=data[i],x=toX(i);
+    ctx.strokeStyle='rgba(139,164,200,.2)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(x,PT);ctx.lineTo(x,H-PB);ctx.stroke();
+    if(S.hoverY){ctx.beginPath();ctx.moveTo(PL,S.hoverY);ctx.lineTo(W-PR,S.hoverY);ctx.stroke();}
+    ctx.setLineDash([]);
+    // Candle info tooltip
+    const tip=`O: ${fmtP(d.o,sym)}  H: ${fmtP(d.h,sym)}  L: ${fmtP(d.l,sym)}  C: ${fmtP(d.c,sym)}`;
+    ctx.font='10px Geist Mono,monospace';ctx.textAlign='left';
+    const tw=ctx.measureText(tip).width+14;
+    ctx.fillStyle='#111b2e';ctx.strokeStyle='#1c2a42';ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(PL+2,PT+2,tw,20,4);ctx.fill();ctx.stroke();
+    ctx.fillStyle=d.c>=d.o?'#10d97c':'#ff4560';
+    ctx.fillText(tip,PL+9,PT+15);
+    // Price label left
+    if(S.hoverY&&S.hoverY>PT&&S.hoverY<H-PB){
+      const pr=minP+(1-(S.hoverY-PT)/CH)*PR2;
+      ctx.fillStyle='#152035';ctx.strokeStyle='#243450';
+      ctx.beginPath();ctx.roundRect(0,S.hoverY-9,PL-4,18,3);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#8fa4c8';ctx.textAlign='right';
+      ctx.fillText(fmtP(pr,sym),PL-7,S.hoverY+4);
+    }
+  }
+  // Last price line
+  const lastP=data[data.length-1].c;
+  const lastY=toY(lastP);
+  ctx.strokeStyle='rgba(59,126,255,.4)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(PL,lastY);ctx.lineTo(W-PR,lastY);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#3b7eff';
+  ctx.beginPath();ctx.roundRect(W-PR,lastY-8,PR+1,16,2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='9px Geist Mono,monospace';ctx.textAlign='left';
+  ctx.fillText(fmtP(lastP,sym),W-PR+3,lastY+4);
+}
+
+function tfLbl(i,total,tf){
+  const ms={1:36e5,4:144e5,'1D':864e5,'1W':6048e5}[tf]||864e5;
+  const d=new Date(Date.now()-(total-i)*ms);
+  if(tf==='1D'||tf==='1W') return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]+' '+d.getDate();
+  return d.getHours()+':00';
+}
+function setTF(tf,btn){
+  document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');S.tf=tf;delete S.candles[S.pair];drawChart();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ORDER BOOK
+═══════════════════════════════════════════════════════════════ */
+function renderOB(){
+  const sym=S.pair,p=S.prices[sym]||SEED[sym]||1;
+  const spread=p*.0003,asks=[],bids=[];
+  for(let i=0;i<8;i++){
+    asks.unshift({p:p+spread/2+(i+1)*p*.0005+Math.random()*p*.0002,a:(Math.random()*2+.1).toFixed(4)});
+    bids.push({p:p-spread/2-(i+1)*p*.0005-Math.random()*p*.0002,a:(Math.random()*2+.1).toFixed(4)});
+  }
+  asks.forEach(a=>a.t=(a.p*a.a).toFixed(0));
+  bids.forEach(b=>b.t=(b.p*b.a).toFixed(0));
+  const maxT=Math.max(...asks.map(a=>+a.t),...bids.map(b=>+b.t));
+  const row=(d,cls)=>`<div class="ob-row"><span class="${cls} mono">${fmtP(d.p,sym)}</span><span class="mono" style="text-align:right">${d.a}</span><span class="mono muted" style="text-align:right">${n(+d.t)}</span><div class="ob-depth ${cls}" style="width:${(+d.t/maxT*100).toFixed(0)}%"></div></div>`;
+  const ae=document.getElementById('ob-asks');const be=document.getElementById('ob-bids');
+  if(ae) ae.innerHTML=asks.map(a=>row(a,'down')).join('');
+  if(be) be.innerHTML=bids.map(b=>row(b,'up')).join('');
+  const sp=document.getElementById('ob-spread');
+  if(sp) sp.textContent=`Spread: ${fmtP(spread,sym)} (${(spread/p*100).toFixed(3)}%)`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TRADE BAR + PAIR SWITCHER
+═══════════════════════════════════════════════════════════════ */
+function initPairSwitcher(){
+  const ps=document.getElementById('pair-switcher');
+  if(!ps) return;
+  const pairs=['BTC','ETH','SOL','BNB','XRP'];
+  ps.innerHTML=pairs.map(sym=>`<div class="pair-btn ${sym===S.pair?'active':''}" onclick="setPair('${sym}')">
+    <span class="sym">${sym}/USDT</span>
+    <span class="pr" id="ps-p-${sym}">—</span>
+    <span class="chg ${(S.changes[sym]||0)>=0?'up':'down'}" id="ps-c-${sym}">—</span>
+  </div>`).join('');
+  updateTradeBar();
+}
+function setPair(sym){
+  S.pair=sym;
+  document.querySelectorAll('.pair-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.pair-btn[onclick*="'${sym}'"]`)?.classList.add('active');
+  delete S.candles[sym];
+  updateTradeBar();renderOB();drawChart();
+  const sb=document.getElementById('submit-btn');
+  if(sb){sb.textContent=`${S.side==='buy'?'Buy / Long':'Sell / Short'} ${sym}`;sb.className='submit-btn '+(S.side==='buy'?'buy':'sell');}
+}
+function updateTradeBar(){
+  const sym=S.pair,p=S.prices[sym]||SEED[sym]||0,c=S.changes[sym]||0;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('tm-price',fmtP(p,sym));
+  const ce=document.getElementById('tm-chg');
+  if(ce){ce.textContent=(c>=0?'+':'')+c.toFixed(2)+'%';ce.className='tm-chg '+(c>=0?'up':'down');}
+  set('tm-high',fmtP(p*1.025,sym));set('tm-low',fmtP(p*.975,sym));
+  set('tm-vol','$'+n(S.vols[sym]||p*rnd(800,3000)));
+  set('tm-trades',n(rnd(12000,48000)));
+  // Update pair switcher prices
+  ['BTC','ETH','SOL','BNB','XRP'].forEach(s=>{
+    const pp=document.getElementById('ps-p-'+s);const pc=document.getElementById('ps-c-'+s);
+    if(pp) pp.textContent=fmtP(S.prices[s]||SEED[s]||0,s);
+    if(pc){const ch=S.changes[s]||0;pc.textContent=(ch>=0?'+':'')+ch.toFixed(2)+'%';pc.className='chg '+(ch>=0?'up':'down');}
+  });
+  calcOrder();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ORDER FORM
+═══════════════════════════════════════════════════════════════ */
+function setSide(s){
+  S.side=s;
+  document.getElementById('btn-buy').classList.toggle('active',s==='buy');
+  document.getElementById('btn-sell').classList.toggle('active',s==='sell');
+  const b=document.getElementById('submit-btn');
+  if(b){b.textContent=`${s==='buy'?'Buy / Long':'Sell / Short'} ${S.pair}`;b.className='submit-btn '+(s==='buy'?'buy':'sell');}
+  calcOrder();
+}
+function setOT(t,el){
+  S.ot=t;
+  document.querySelectorAll('.ot-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const lg=document.getElementById('g-limit');
+  if(lg) lg.style.display=t==='limit'||t==='stop'?'block':'none';
+}
+function setLev(v){S.lev=+v;const e=document.getElementById('lev-disp');if(e)e.textContent=v+'x';calcOrder();}
+function pct(p){
+  const el=document.getElementById('ip-amount');if(!el) return;
+  el.value=(S.portfolio.USDT*(p/100)).toFixed(2);calcOrder();
+}
+function calcOrder(){
+  const amt=+(document.getElementById('ip-amount')?.value||0);
+  const p=S.prices[S.pair]||SEED[S.pair]||1,lev=S.lev;
+  const val=amt*lev,fee=val*.0004;
+  const liqPct=1/lev*.9;
+  const liqP=S.side==='buy'?p*(1-liqPct):p*(1+liqPct);
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('os-val','$'+n(val));set('os-margin','$'+n(amt));
+  set('os-fee','$'+(fee).toFixed(4));set('os-liq',fmtP(liqP,S.pair));
+  const bd=document.getElementById('bal-disp');if(bd)bd.textContent='Bal: $'+n(S.portfolio.USDT||0);
+}
+function placeOrder(){
+  const sym=S.pair,p=S.prices[sym]||SEED[sym]||0;
+  const amt=+(document.getElementById('ip-amount')?.value||0);
+  if(!amt||amt<=0) return toast('Input Error','error','Enter a valid amount');
+  if(amt>S.portfolio.USDT) return toast('Insufficient Balance','error','Not enough USDT');
+  const lev=S.lev,liqPct=1/lev*.9;
+  const liqP=S.side==='buy'?p*(1-liqPct):p*(1+liqPct);
+  const pos={id:Date.now(),sym,side:S.side,size:amt*lev,margin:amt,entry:p,liqP,lev,time:new Date().toLocaleTimeString()};
+  if(S.ot==='limit'){
+    const lp=+(document.getElementById('ip-limit')?.value||p);
+    pos.limitP=lp;S.orders.push(pos);
+    toast('Order Placed','info',`LIMIT ${S.side.toUpperCase()} $${n(amt*lev)} ${sym} @ ${fmtP(lp,sym)}`);
+  } else {
+    S.positions.push(pos);S.portfolio.USDT-=amt;
+    S.history.push({t:new Date().toLocaleString(),sym,side:pos.side,size:pos.size,price:pos.entry,lev,type:'open'});
+    toast('Position Opened','success',`${S.side.toUpperCase()} $${n(amt*lev)} ${sym} @ ${fmtP(p,sym)}`);
+  }
+  document.getElementById('ip-amount').value='';
+  calcOrder();renderFtab();
+}
+function closePos(id){
+  const idx=S.positions.findIndex(p=>p.id===id);if(idx===-1)return;
+  const pos=S.positions[idx],p=S.prices[pos.sym]||pos.entry;
+  const pnl=calcPnl(pos,p);
+  S.portfolio.USDT+=pos.margin+pnl;
+  S.history.push({t:new Date().toLocaleString(),sym:pos.sym,side:pos.side,size:pos.size,price:p,lev:pos.lev,pnl,type:'close'});
+  S.positions.splice(idx,1);
+  toast(pnl>=0?'Position Closed ✓':'Position Closed',pnl>=0?'success':'error',`P&L: ${pnl>=0?'+':''}$${pnl.toFixed(2)}`);
+  renderFtab();
+}
+function calcPnl(pos,p){return pos.size*(pos.side==='buy'?1:-1)*(p-pos.entry)/pos.entry;}
+
+function renderFtab(){
+  const el=document.getElementById('ftab-body');if(!el)return;
+  const pc=document.getElementById('pc');if(pc)pc.textContent=S.positions.length;
+  const oc=document.getElementById('oc');if(oc)oc.textContent=S.orders.length;
+  if(S.ftab==='positions'){
+    if(!S.positions.length){el.innerHTML='<div class="empty"><div class="ei">◻</div><div class="et">No open positions</div></div>';return;}
+    el.innerHTML=`<table><thead><tr><th>Pair</th><th>Side</th><th>Size</th><th>Entry</th><th>Mark</th><th>Liq. Price</th><th>Leverage</th><th>Unrealized P&L</th><th>Action</th></tr></thead><tbody>
+    ${S.positions.map(p=>{
+      const mark=S.prices[p.sym]||p.entry,pnl=calcPnl(p,mark),pnlP=(pnl/p.margin*100);
+      return `<tr><td class="mono" style="font-weight:700">${p.sym}/USDT</td><td><span class="side-chip ${p.side==='buy'?'long':'short'}">${p.side==='buy'?'LONG':'SHORT'}</span></td><td class="mono">$${n(p.size)}</td><td class="mono">${fmtP(p.entry,p.sym)}</td><td class="mono">${fmtP(mark,p.sym)}</td><td class="mono down">${fmtP(p.liqP,p.sym)}</td><td class="mono">${p.lev}x</td><td class="pnl-val ${pnl>=0?'up':'down'}">${pnl>=0?'+':''}$${pnl.toFixed(2)} (${pnlP>=0?'+':''}${pnlP.toFixed(2)}%)</td><td><button class="act-btn" onclick="closePos(${p.id})">Close</button></td></tr>`;
+    }).join('')}</tbody></table>`;
+  } else if(S.ftab==='orders'){
+    if(!S.orders.length){el.innerHTML='<div class="empty"><div class="ei">◻</div><div class="et">No open orders</div></div>';return;}
+    el.innerHTML=`<table><thead><tr><th>Pair</th><th>Side</th><th>Type</th><th>Size</th><th>Limit Price</th><th>Leverage</th><th>Action</th></tr></thead><tbody>
+    ${S.orders.map((o,i)=>`<tr><td class="mono">${o.sym}/USDT</td><td><span class="side-chip ${o.side==='buy'?'long':'short'}">${o.side==='buy'?'LONG':'SHORT'}</span></td><td>LIMIT</td><td class="mono">$${n(o.size)}</td><td class="mono">${fmtP(o.limitP,o.sym)}</td><td class="mono">${o.lev}x</td><td><button class="act-btn" onclick="cancelOrder(${i})">Cancel</button></td></tr>`).join('')}</tbody></table>`;
+  } else {
+    if(!S.history.length){el.innerHTML='<div class="empty"><div class="ei">◻</div><div class="et">No trade history</div></div>';return;}
+    el.innerHTML=`<table><thead><tr><th>Time</th><th>Pair</th><th>Side</th><th>Size</th><th>Price</th><th>Leverage</th><th>P&L</th><th>Type</th></tr></thead><tbody>
+    ${S.history.slice().reverse().map(h=>`<tr><td class="mono dim" style="font-size:11px">${h.t}</td><td class="mono">${h.sym}/USDT</td><td><span class="side-chip ${h.side==='buy'?'long':'short'}">${h.side==='buy'?'LONG':'SHORT'}</span></td><td class="mono">$${n(h.size)}</td><td class="mono">${fmtP(h.price,h.sym)}</td><td class="mono">${h.lev}x</td><td class="${h.pnl!==undefined?(h.pnl>=0?'up':'down'):'muted'} mono">${h.pnl!==undefined?((h.pnl>=0?'+':'')+'$'+h.pnl.toFixed(2)):'—'}</td><td><span class="tag ${h.type==='open'?'tag-blue':'tag-green'}">${h.type.toUpperCase()}</span></td></tr>`).join('')}</tbody></table>`;
+  }
+}
+function ftab(t,el){S.ftab=t;document.querySelectorAll('.tf-tab').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderFtab();}
+function cancelOrder(i){S.orders.splice(i,1);renderFtab();toast('Order Cancelled','info','Limit order removed');}
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════════ */
+function renderDash(){
+  const h=new Date().getHours();
+  const greet=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', '+S.user?.name?.split(' ')[0];
+  const ge=document.getElementById('dash-greet');if(ge)ge.textContent=greet;
+  // Portfolio value
+  let total=0;
+  COINS.forEach(sym=>{const p=sym==='USDT'?1:(S.prices[sym]||SEED[sym]||0);total+=(S.portfolio[sym]||0)*p;});
+  const upnl=S.positions.reduce((s,p)=>s+calcPnl(p,S.prices[p.sym]||p.entry),0);
+  const wins=S.history.filter(h=>h.type==='close'&&h.pnl>0).length;
+  const closed=S.history.filter(h=>h.type==='close').length;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('pf-val','$'+n(total));
+  const pce=document.getElementById('pf-chg');
+  if(pce){pce.textContent=(upnl>=0?'+':'')+'$'+Math.abs(upnl).toFixed(2)+' ('+(upnl/total*100).toFixed(2)+'%)';pce.className='pf-badge '+(upnl>=0?'up':'down');}
+  set('pf-avail','$'+n(S.portfolio.USDT));
+  set('pf-upnl',(upnl>=0?'+':'')+'$'+Math.abs(upnl).toFixed(2));
+  document.getElementById('pf-upnl')?.classList.toggle('up',upnl>=0);
+  document.getElementById('pf-upnl')?.classList.toggle('down',upnl<0);
+  set('pf-trades',closed);
+  set('pf-wr',closed?(wins/closed*100).toFixed(0)+'%':'—');
+  // Stat cards
+  const stakedUsd=Object.entries(S.staking).reduce((s,[sym,d])=>s+d.staked*(sym==='USDT'?1:(S.prices[sym]||SEED[sym]||0)),0);
+  set('s-pnl',(upnl>=0?'+':'')+'$'+Math.abs(upnl).toFixed(2));
+  document.getElementById('s-pnl')?.classList.toggle('up',upnl>=0);
+  document.getElementById('s-pnl')?.classList.toggle('down',upnl<0);
+  set('s-staked','$'+n(stakedUsd));
+  set('s-copy','$'+n(S.following.length*rnd(50,300)));
+  set('s-copy-sub',S.following.length+' trader'+(S.following.length!==1?'s':'')+' followed');
+  const kycStatus=S.user?.kyc;
+  set('s-kyc',kycStatus==='verified'?'Verified':S.kycDone?'In Review':'Unverified');
+  set('s-kyc-sub',kycStatus==='verified'?'Full access unlocked':S.kycDone?'Under review':'Complete to unlock');
+  const ki=document.getElementById('s-kyc-icon');
+  if(ki){ki.textContent=kycStatus==='verified'?'✅':S.kycDone?'⏳':'⚠️';ki.style.background=kycStatus==='verified'?'var(--green-dim)':S.kycDone?'var(--amber-dim)':'var(--red-dim)';}
+  // Allocation
+  const al=document.getElementById('alloc-list');
+  if(al){
+    const colors={BTC:'#f7931a',ETH:'#627eea',SOL:'#9945ff',USDT:'#26a17b',BNB:'#f3ba2f',XRP:'#00aae4'};
+    const items=COINS.map(sym=>{const p=sym==='USDT'?1:(S.prices[sym]||SEED[sym]||0);const usd=(S.portfolio[sym]||0)*p;return{sym,usd};}).sort((a,b)=>b.usd-a.usd);
+    const tot=items.reduce((s,i)=>s+i.usd,0)||1;
+    al.innerHTML=items.map(it=>`<div class="alloc-item">
+      <div class="alloc-coin wc-icon ci-${it.sym.toLowerCase()}">${{BTC:'₿',ETH:'Ξ',SOL:'◎',USDT:'$',BNB:'⬡',XRP:'✕'}[it.sym]||'?'}</div>
+      <div class="alloc-name">${it.sym}</div>
+      <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:${(it.usd/tot*100).toFixed(1)}%;background:${colors[it.sym]}"></div></div>
+      <div class="alloc-pct">${(it.usd/tot*100).toFixed(1)}%</div>
+      <div class="alloc-usd mono">$${n(it.usd)}</div>
+    </div>`).join('');
+  }
+  // Open positions mini
+  const pl=document.getElementById('pos-mini-list');
+  const pc2=document.getElementById('pos-ct');
+  if(pc2) pc2.textContent=S.positions.length;
+  if(pl){
+    if(!S.positions.length) pl.innerHTML='<div class="empty" style="padding:16px"><div class="et">No open positions</div></div>';
+    else pl.innerHTML=S.positions.map(p=>{
+      const mark=S.prices[p.sym]||p.entry,pnl=calcPnl(p,mark);
+      return `<div class="pm-item"><div style="display:flex;align-items:center;gap:8px"><span class="side-chip ${p.side==='buy'?'long':'short'}">${p.side==='buy'?'L':'S'}</span><span class="mono" style="font-size:12px;font-weight:600">${p.sym}/USDT</span><span class="mono" style="font-size:11px;color:var(--text3)">${p.lev}x</span></div><div class="pnl-val ${pnl>=0?'up':'down'}">${pnl>=0?'+':''}$${pnl.toFixed(2)}</div></div>`;
+    }).join('');
+  }
+  // Activity feed
+  renderActivity();
+}
+
+function renderActivity(){
+  const af=document.getElementById('af-body');
+  if(!af) return;
+  const coins=['BTC','ETH','SOL','BNB','XRP'];
+  const icons={BTC:'₿',ETH:'Ξ',SOL:'◎',BNB:'⬡',XRP:'✕'};
+  const cls={BTC:'ci-btc',ETH:'ci-eth',SOL:'ci-sol',BNB:'ci-bnb',XRP:'ci-xrp'};
+  const items=Array.from({length:10},(_,i)=>{
+    const sym=coins[i%5],p=S.prices[sym]||SEED[sym]||0,c=S.changes[sym]||0;
+    const mins=[1,2,3,5,8,12,15,22,35,47][i];
+    return{sym,p,c,mins};
+  });
+  af.innerHTML=items.map(it=>`<div class="af-item">
+    <div class="af-coin ${cls[it.sym]}">${icons[it.sym]}</div>
+    <div class="af-info"><div class="af-pair">${it.sym}/USDT</div><div class="af-time">${it.mins}m ago</div></div>
+    <div class="af-right"><div class="af-price mono">${fmtP(it.p,it.sym)}</div><div class="af-chg ${it.c>=0?'up':'down'}">${it.c>=0?'+':''}${it.c.toFixed(2)}%</div></div>
+  </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   WALLET
+═══════════════════════════════════════════════════════════════ */
+function renderWallet(){
+  let total=0;
+  COINS.forEach(sym=>{const p=sym==='USDT'?1:(S.prices[sym]||SEED[sym]||0);total+=(S.portfolio[sym]||0)*p;});
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('w-total','$'+n(total));
+  const we=document.getElementById('w-chg');
+  const avgChg=Object.values(S.changes).reduce((s,c)=>s+c,0)/5;
+  if(we){we.textContent=(avgChg>=0?'+':'')+avgChg.toFixed(2)+'%';we.className='tag '+(avgChg>=0?'tag-green':'tag-red');}
+  const wg=document.getElementById('wallet-grid');
+  const iconChar={BTC:'₿',ETH:'Ξ',SOL:'◎',USDT:'$',BNB:'⬡',XRP:'✕'};
+  const barColor={BTC:'#f7931a',ETH:'#627eea',SOL:'#9945ff',USDT:'#26a17b',BNB:'#f3ba2f',XRP:'#00aae4'};
+  if(wg) wg.innerHTML=COINS.map(sym=>{
+    const amt=S.portfolio[sym]||0,p=sym==='USDT'?1:(S.prices[sym]||SEED[sym]||0);
+    const usd=amt*p,c=sym==='USDT'?0:(S.changes[sym]||0);
+    return `<div class="wc" onclick="openDepModal('${sym}')">
+      <div class="wc-top">
+        <div class="wc-coin"><div class="wc-icon ci-${sym.toLowerCase()}">${iconChar[sym]||sym}</div><div><div class="wc-name">${sym}</div><div class="wc-full">${COIN_FULL[sym]}</div></div></div>
+        ${sym!=='USDT'?`<div class="wc-chg ${c>=0?'up':'down'}">${c>=0?'+':''}${c.toFixed(2)}%</div>`:'<div class="tag tag-green">Stable</div>'}
+      </div>
+      <div class="wc-amount mono">${sym==='USDT'?'$'+n(amt):amt.toFixed(sym==='BTC'?6:4)} ${sym}</div>
+      <div class="wc-usd">≈ $${n(usd)}</div>
+      <div class="wc-btns">
+        <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openDepModal('${sym}')">⬇ Deposit</button>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openModal('wd-modal')">⬆ Withdraw</button>
+      </div>
+      <div class="wc-bar" style="background:${barColor[sym]}"></div>
+    </div>`;
+  }).join('');
+  // Transactions
+  const tb=document.getElementById('tx-body');
+  if(tb){
+    if(!S.txns.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3);font-size:12px">No transactions yet</td></tr>';return;}
+    tb.innerHTML=S.txns.slice().reverse().map(t=>{
+      const p=t.asset==='USDT'?1:(S.prices[t.asset]||SEED[t.asset]||0);
+      return `<tr>
+        <td class="mono dim" style="font-size:11px">${t.date}</td>
+        <td><span class="tx-type ${t.type}">${t.type.toUpperCase()}</span></td>
+        <td style="font-weight:600">${t.asset}</td>
+        <td class="mono ${t.type==='deposit'?'up':'down'}">${t.type==='deposit'?'+':'-'}${t.amount}</td>
+        <td class="mono dim">$${n(+t.amount*p)}</td>
+        <td><span class="tx-status">Completed</span></td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function openDepModal(sym){ document.getElementById('dep-asset').value=sym;document.getElementById('dep-unit').textContent=sym;openModal('deposit-modal'); }
+function doDeposit(){
+  const asset=document.getElementById('dep-asset').value;
+  const amt=+(document.getElementById('dep-amt').value||0);
+  if(!amt||amt<=0) return toast('Validation','error','Enter a valid amount');
+  S.portfolio[asset]=(S.portfolio[asset]||0)+amt;
+  S.txns.push({date:new Date().toLocaleString(),type:'deposit',asset,amount:amt.toFixed(asset==='USDT'?2:6)});
+  closeModal('deposit-modal');document.getElementById('dep-amt').value='';
+  toast('Deposit Successful','success',`${amt} ${asset} credited to your account`);
+  if(S.page==='wallet') renderWallet();
+}
+function doWithdraw(){
+  const asset=document.getElementById('wd-asset').value;
+  const amt=+(document.getElementById('wd-amt').value||0);
+  const addr=document.getElementById('wd-addr').value;
+  if(!amt||amt<=0||!addr) return toast('Validation','error','Fill all fields');
+  if(amt>(S.portfolio[asset]||0)) return toast('Insufficient Balance','error','Not enough '+asset);
+  S.portfolio[asset]-=amt;
+  S.txns.push({date:new Date().toLocaleString(),type:'withdraw',asset,amount:amt.toFixed(asset==='USDT'?2:6)});
+  closeModal('wd-modal');
+  toast('Withdrawal Submitted','info',`${amt} ${asset} sent to ${addr.slice(0,12)}...`);
+  if(S.page==='wallet') renderWallet();
+}
+document.getElementById('dep-asset')?.addEventListener('change',e=>document.getElementById('dep-unit').textContent=e.target.value);
+
+/* ═══════════════════════════════════════════════════════════════
+   EARN
+═══════════════════════════════════════════════════════════════ */
+const POOLS=[
+  {sym:'BTC',name:'Bitcoin',apy:4.2,lockDays:30,color:'#f7931a',icon:'₿',desc:'30-day lock, auto-compound'},
+  {sym:'ETH',name:'Ethereum',apy:5.8,lockDays:14,color:'#627eea',icon:'Ξ',desc:'14-day lock, auto-compound'},
+  {sym:'USDT',name:'Tether USD',apy:12.0,lockDays:0,color:'#26a17b',icon:'$',desc:'Flexible, withdraw anytime'},
+];
+
+function renderEarn(){
+  const totalStaked=Object.entries(S.staking).reduce((s,[sym,d])=>s+d.staked*(sym==='USDT'?1:(S.prices[sym]||SEED[sym]||0)),0);
+  const daily=Object.entries(S.staking).reduce((s,[sym,d])=>s+d.staked*(sym==='USDT'?1:(S.prices[sym]||SEED[sym]||0))*({BTC:4.2,ETH:5.8,USDT:12.0}[sym]/100/365),0);
+  const allTime=Object.values(S.staking).reduce((s,d)=>s+d.earned,0);
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('e-total','$'+n(totalStaked));
+  set('e-daily','$'+daily.toFixed(4));
+  set('e-alltime','$'+allTime.toFixed(4));
+  const sg=document.getElementById('stake-grid');
+  if(!sg) return;
+  sg.innerHTML=POOLS.map(pool=>{
+    const d=S.staking[pool.sym];
+    const p=pool.sym==='USDT'?1:(S.prices[pool.sym]||SEED[pool.sym]||0);
+    const stakedUsd=d.staked*p;
+    const dailyEarn=stakedUsd*(pool.apy/100/365);
+    const utilization=Math.min(100,(d.pool*p/(d.pool*p+1e6))*100+30);
+    return `<div class="stake-card">
+      <div class="stake-glow" style="background:radial-gradient(${pool.color},transparent)"></div>
+      <div class="stake-header">
+        <div class="stake-coin-info">
+          <div class="wc-icon ci-${pool.sym.toLowerCase()}" style="width:44px;height:44px;border-radius:10px;font-size:18px">${pool.icon}</div>
+          <div>
+            <div style="font-size:15px;font-weight:700">${pool.name}</div>
+            <div style="font-size:11px;color:var(--text2)">${pool.desc}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="stake-apy">${pool.apy}%</div>
+          <div class="apy-label">APY</div>
+        </div>
+      </div>
+      <div class="stake-divider"></div>
+      <div class="stake-stat-row"><span class="sk">Your Stake</span><span class="sv mono">${d.staked.toFixed(pool.sym==='BTC'?6:pool.sym==='USDT'?2:4)} ${pool.sym}</span></div>
+      <div class="stake-stat-row"><span class="sk">Value (USD)</span><span class="sv mono">$${n(stakedUsd)}</span></div>
+      <div class="stake-stat-row"><span class="sk">Daily Earnings</span><span class="sv up mono">+$${dailyEarn.toFixed(4)}</span></div>
+      <div class="stake-stat-row"><span class="sk">Total Earned</span><span class="sv up mono">$${d.earned.toFixed(4)}</span></div>
+      <div class="stake-divider"></div>
+      <div class="stake-pool-label">Pool Utilization · $${n(d.pool*p)}</div>
+      <div class="stake-progress"><div class="stake-progress-bar" style="width:${utilization.toFixed(0)}%;background:${pool.color}"></div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-primary btn-sm" style="flex:1" onclick="openStakeModal('${pool.sym}','stake')">Stake</button>
+        ${d.staked>0?`<button class="btn btn-outline btn-sm" style="flex:1" onclick="openStakeModal('${pool.sym}','unstake')">Unstake</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openStakeModal(sym,action){
+  S.stakeCtx={sym,action};
+  const pool=POOLS.find(p=>p.sym===sym);
+  const d=S.staking[sym],bal=S.portfolio[sym]||0;
+  document.getElementById('stake-modal-title').textContent=(action==='stake'?'Stake ':'Unstake ')+sym;
+  document.getElementById('stake-modal-body').innerHTML=`
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:14px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span class="muted">APY</span><span class="mono up">${pool.apy}%</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span class="muted">${action==='stake'?'Available Balance':'Currently Staked'}</span><span class="mono">${(action==='stake'?bal:d.staked).toFixed(6)} ${sym}</span></div>
+      ${pool.lockDays?`<div style="display:flex;justify-content:space-between;font-size:12px"><span class="muted">Lock Period</span><span class="mono">${pool.lockDays} days</span></div>`:'<div style="display:flex;justify-content:space-between;font-size:12px"><span class="muted">Lock Period</span><span class="mono up">Flexible</span></div>'}
+    </div>
+    <div class="fg"><label>${action==='stake'?'Amount to Stake':'Amount to Unstake'}</label><div style="position:relative"><input type="number" id="stake-amt" placeholder="0.00" style="padding-right:50px"><span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);font-weight:600">${sym}</span></div></div>`;
+  openModal('stake-modal');
+}
+function doStake(){
+  if(!S.stakeCtx) return;
+  const{sym,action}=S.stakeCtx,amt=+(document.getElementById('stake-amt')?.value||0);
+  if(!amt||amt<=0) return toast('Validation','error','Enter valid amount');
+  if(action==='stake'){
+    if(amt>(S.portfolio[sym]||0)) return toast('Insufficient Balance','error','Not enough '+sym);
+    S.portfolio[sym]-=amt;S.staking[sym].staked+=amt;
+    toast('Staked Successfully','success',`${amt} ${sym} staked`);
+  } else {
+    if(amt>S.staking[sym].staked) return toast('Error','error','Not enough staked');
+    S.staking[sym].staked-=amt;S.portfolio[sym]=(S.portfolio[sym]||0)+amt;
+    toast('Unstaked Successfully','success',`${amt} ${sym} returned to wallet`);
+  }
+  closeModal('stake-modal');renderEarn();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COPY TRADING
+═══════════════════════════════════════════════════════════════ */
+const TRADERS=[
+  {id:1,name:'CryptoWizard',country:'🇸🇬',av:'CW',banner:'linear-gradient(135deg,#1a2a6c,#b21f1f,#fdbb2d)',roi:248.5,wr:72.4,trades:1842,follow:9240,dd:12.3,desc:'Systematic trend-following on BTC/ETH majors. Low drawdown, consistent returns.',pairs:['BTC','ETH']},
+  {id:2,name:'SatoshiArmy',country:'🇯🇵',av:'SA',banner:'linear-gradient(135deg,#f7931a,#141414)',roi:186.2,wr:68.1,trades:2341,follow:7831,dd:18.7,desc:'High-frequency BTC scalping with DCA accumulation strategy.',pairs:['BTC']},
+  {id:3,name:'AlphaWhale',country:'🇺🇸',av:'AW',banner:'linear-gradient(135deg,#0f2027,#203a43,#2c5364)',roi:312.8,wr:76.9,trades:987,follow:12400,dd:9.8,desc:'Low-frequency swing trades, institutional macro approach.',pairs:['BTC','ETH','SOL']},
+  {id:4,name:'DeFiSensei',country:'🇰🇷',av:'DS',banner:'linear-gradient(135deg,#4776e6,#8e54e9)',roi:441.1,wr:71.2,trades:3210,follow:18700,dd:22.1,desc:'DeFi-native trader, liquidity provisioning and on-chain alpha.',pairs:['ETH','SOL','BNB']},
+  {id:5,name:'GridMaster',country:'🇩🇪',av:'GM',banner:'linear-gradient(135deg,#134e5e,#71b280)',roi:124.3,wr:81.2,trades:5620,follow:6200,dd:5.2,desc:'Quantitative grid bot strategy with minimal drawdown. Best risk-adjusted returns.',pairs:['BTC','ETH']},
+  {id:6,name:'MoonChaser',country:'🇧🇷',av:'MC',banner:'linear-gradient(135deg,#0f0c29,#302b63,#24243e)',roi:567.4,wr:64.3,trades:1203,follow:24900,dd:31.5,desc:'High-risk altcoin momentum. Massive upside, higher volatility.',pairs:['SOL','XRP','BNB']},
+];
+function renderCopy(){
+  const tg=document.getElementById('trader-grid');
+  if(tg) tg.innerHTML=TRADERS.map(t=>`<div class="trader-card">
+    <div class="tc-banner" style="background:${t.banner}">
+      <div style="display:flex;gap:4px;margin-top:auto">
+        ${t.pairs.map(sym=>`<span class="tag tag-blue" style="font-size:9px">${sym}</span>`).join('')}
+      </div>
+      <div class="tc-avatar ci-${['BTC','ETH','SOL','BNB','XRP'][t.id%5]}" style="background:rgba(0,0,0,.4);border-color:var(--bg1)">${t.av}</div>
+    </div>
+    <div class="tc-body">
+      <div class="tc-name">${t.name} ${t.country}</div>
+      <div class="tc-meta">
+        <span class="tc-verified">✓ Verified</span>
+        <span class="dim" style="font-size:11px">👥 ${n2(t.follow)} followers</span>
+      </div>
+      <div class="tc-stats">
+        <div class="tc-stat"><div class="tsk">ROI</div><div class="tsv up">+${t.roi}%</div></div>
+        <div class="tc-stat"><div class="tsk">Win Rate</div><div class="tsv">${t.wr}%</div></div>
+        <div class="tc-stat"><div class="tsk">Trades</div><div class="tsv">${n2(t.trades)}</div></div>
+        <div class="tc-stat"><div class="tsk">Max DD</div><div class="tsv down">${t.dd}%</div></div>
+      </div>
+      <div class="tc-desc">${t.desc}</div>
+      <button class="follow-btn ${S.following.includes(t.id)?'following':''}" onclick="toggleFollow(${t.id},this)">${S.following.includes(t.id)?'✓ Following':'+ Follow Trader'}</button>
+    </div>
+  </div>`).join('');
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('cp-following',S.following.length);
+  set('cp-pnl','$'+n(S.following.length*rnd(50,400)));
+  set('cp-capital','$'+n(S.following.length*500));
+}
+function toggleFollow(id,btn){
+  const idx=S.following.indexOf(id);
+  if(idx===-1){S.following.push(id);btn.textContent='✓ Following';btn.classList.add('following');toast('Following','success',TRADERS.find(t=>t.id===id)?.name+' added to your copy list');}
+  else{S.following.splice(idx,1);btn.textContent='+ Follow Trader';btn.classList.remove('following');toast('Unfollowed','info','Trader removed from copy list');}
+  const fe=document.getElementById('cp-following');if(fe)fe.textContent=S.following.length;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   KYC
+═══════════════════════════════════════════════════════════════ */
+function renderKYC(){
+  const steps=[{title:'Personal Info',sub:'Name, DOB, address'},{title:'Identity Doc',sub:'Passport, ID, license'},{title:'Document Upload',sub:'Photos & selfie'}];
+  const sb=document.getElementById('kyc-steps-sidebar');
+  if(sb) sb.innerHTML=steps.map((s,i)=>`<div class="kyc-step-item ${S.kycStep===i+1?'active':''}">
+    <div class="ksi-circle ${S.kycDone||S.kycStep>i+1?'done':S.kycStep===i+1?'active':''}">${S.kycDone||S.kycStep>i+1?'✓':i+1}</div>
+    <div class="ksi-info"><div class="ksi-title">${s.title}</div><div class="ksi-sub">${s.sub}</div></div>
+  </div>`).join('');
+  const sa=document.getElementById('kyc-status-area');
+  if(sa){
+    if(S.user?.kyc==='verified') sa.innerHTML='<div class="kyc-alert verified" style="margin:0;padding:8px 14px"><span>✅</span><span style="font-weight:600">Identity Verified</span></div>';
+    else if(S.kycDone) sa.innerHTML='<div class="kyc-alert pending" style="margin:0;padding:8px 14px"><span>⏳</span><span style="font-weight:600">Under Review</span></div>';
+  }
+}
+function kycNext(step){document.getElementById('kyc-p'+step).classList.remove('active');document.getElementById('kyc-p'+(step+1)).classList.add('active');S.kycStep=step+1;renderKYC();}
+function kycPrev(step){document.getElementById('kyc-p'+step).classList.remove('active');document.getElementById('kyc-p'+(step-1)).classList.add('active');S.kycStep=step-1;renderKYC();}
+function fakeUpload(type){
+  S.uploads[type]=true;
+  document.getElementById('ui-'+type).textContent='✅';
+  document.getElementById('ut-'+type).textContent='Uploaded successfully';
+  document.getElementById('uz-'+type).classList.add('done');
+  toast('Uploaded','success','Document received');
+}
+function submitKYC(){
+  if(!S.uploads.front||!S.uploads.back||!S.uploads.selfie) return toast('Missing Documents','error','Upload all 3 required documents');
+  document.getElementById('kyc-p3').classList.remove('active');
+  document.getElementById('kyc-done').classList.add('active');
+  S.kycDone=true;S.kycStep=4;
+  document.getElementById('kyc-done').innerHTML=`<div style="padding:40px;text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">⏳</div>
+    <div style="font-size:20px;font-weight:700;margin-bottom:8px">Submitted for Review</div>
+    <div style="font-size:13px;color:var(--text2);max-width:360px;margin:0 auto;line-height:1.7">Your documents are being reviewed. Typically 1–2 business days.</div>
+    <div class="kyc-alert pending" style="margin-top:24px;text-align:left"><span style="font-size:20px">⏳</span><div><div style="font-weight:700">Under Review</div><div style="font-size:12px;margin-top:2px">Submitted ${new Date().toLocaleDateString()}. Est. completion: 1–2 business days.</div></div></div>
+  </div>`;
+  document.getElementById('kyc-dot').style.display='none';
+  toast('KYC Submitted','success','Documents submitted for review');
+  renderKYC();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN
+═══════════════════════════════════════════════════════════════ */
+const MOCK_USERS=[
+  {name:'Alex Chen',email:'demo@enslayer2.com',kyc:'pending',status:'active',bal:'$18,420',joined:'Mar 01, 2026',vol:'$42,100'},
+  {name:'Yuki Tanaka',email:'yuki@email.com',kyc:'verified',status:'active',bal:'$142,000',joined:'Feb 18, 2026',vol:'$890,000'},
+  {name:'Sarah Mitchell',email:'sarah@email.com',kyc:'none',status:'active',bal:'$2,100',joined:'Mar 12, 2026',vol:'$8,400'},
+  {name:'Hans Weber',email:'hans@email.com',kyc:'verified',status:'suspended',bal:'$0',joined:'Jan 05, 2026',vol:'$0'},
+  {name:'Priya Kumar',email:'priya@email.com',kyc:'pending',status:'active',bal:'$8,750',joined:'Mar 15, 2026',vol:'$21,000'},
+  {name:'Omar Al Farsi',email:'omar@email.com',kyc:'verified',status:'active',bal:'$55,000',joined:'Feb 01, 2026',vol:'$320,000'},
+];
+const AUDIT_LOG=[
+  {t:'14:22:11',user:'alex.chen',action:'LOGIN',detail:'Successful login from Dubai, UAE',ip:'185.42.0.12',type:'login'},
+  {t:'14:20:05',user:'yuki.tanaka',action:'WITHDRAW',detail:'0.5 BTC → bc1q3y9z... ($43,210)',ip:'103.55.12.8',type:'withdraw'},
+  {t:'14:15:33',user:'priya.kumar',action:'KYC',detail:'Passport uploaded — pending review',ip:'91.200.1.44',type:'kyc'},
+  {t:'13:58:47',user:'admin',action:'SUSPEND',detail:'Hans Weber account suspended',ip:'N/A',type:'suspend'},
+  {t:'13:40:12',user:'omar.alfarsi',action:'TRADE',detail:'BUY BTC $50K × 10x leverage',ip:'5.42.0.9',type:'trade'},
+  {t:'13:10:00',user:'sarah.mitchell',action:'DEPOSIT',detail:'$2,000 USDT via TRC-20',ip:'62.88.0.7',type:'login'},
+];
+function renderAdmin(){
+  const au=document.getElementById('admin-users');
+  if(au) au.innerHTML=MOCK_USERS.map(u=>`<tr>
+    <td style="font-weight:600">${u.name}</td>
+    <td class="mono dim" style="font-size:11px">${u.email}</td>
+    <td><span class="kyc-chip ${u.kyc}">${u.kyc.toUpperCase()}</span></td>
+    <td><span class="status-dot ${u.status}"></span>${u.status}</td>
+    <td class="mono">${u.bal}</td>
+    <td class="mono dim" style="font-size:11px">${u.joined}</td>
+    <td><div class="admin-act-btns"><button class="btn btn-xs btn-outline" onclick="toast('KYC Approved','success','${u.name} verified')">✓ KYC</button><button class="btn btn-xs btn-outline" style="border-color:var(--red-dim);color:var(--red)" onclick="toast('User Suspended','warn','${u.name} suspended')">⊘</button></div></td>
+  </tr>`).join('');
+  const al=document.getElementById('audit-log');
+  if(al) al.innerHTML=AUDIT_LOG.map(a=>`<div class="log-item">
+    <span class="mono dim" style="font-size:10px;min-width:60px">${a.t}</span>
+    <span class="log-action ${a.type}">${a.action}</span>
+    <span class="mono" style="font-size:11px;min-width:90px;color:var(--text2)">${a.user}</span>
+    <span style="flex:1;font-size:12px;color:var(--text2)">${a.detail}</span>
+    <span class="mono dim" style="font-size:10px">${a.ip}</span>
+  </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════════════════════ */
+function openModal(id){document.getElementById(id)?.classList.add('open');}
+function closeModal(id){document.getElementById(id)?.classList.remove('open');}
+document.addEventListener('click',e=>{if(e.target.classList.contains('overlay'))e.target.classList.remove('open');});
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════ */
+function toast(title,type='info',msg=''){
+  const c=document.getElementById('toasts');
+  const icons={success:'✅',error:'❌',info:'ℹ️',warn:'⚠️'};
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<div class="toast-icon">${icons[type]||'ℹ️'}</div><div class="toast-body"><div class="toast-title">${title}</div>${msg?`<div class="toast-msg">${msg}</div>`:''}</div>`;
+  c.appendChild(el);
+  setTimeout(()=>el.remove(),3800);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════════════════ */
+function v(id){return document.getElementById(id)?.value?.trim()||'';}
+function n(x){
+  if(x>=1e9) return(x/1e9).toFixed(2)+'B';
+  if(x>=1e6) return(x/1e6).toFixed(2)+'M';
+  if(x>=1e3) return x.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return Math.abs(x)<.01?x.toFixed(4):x.toFixed(2);
+}
+function n2(x){if(x>=1000) return(x/1000).toFixed(1)+'K';return x;}
+function fmtP(p,sym){
+  if(!p&&p!==0) return '—';
+  if(p>=1000) return '$'+p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(p>=1) return '$'+p.toFixed(2);
+  return '$'+p.toFixed(4);
+}
+function rnd(a,b){return a+Math.random()*(b-a);}
+
+/* ═══════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════ */
+function initApp(){
+  fetchPrices();
+  setInterval(fetchPrices,30000);
+  setInterval(()=>{
+    // Simulate price drift for chart
+    if(S.page==='trade'){renderOB();}
+    // Accrue staking
+    Object.entries(S.staking).forEach(([sym,d])=>{
+      if(d.staked>0){
+        const p=sym==='USDT'?1:(S.prices[sym]||SEED[sym]||0);
+        const apy={BTC:4.2,ETH:5.8,USDT:12.0}[sym]/100;
+        d.earned+=d.staked*p*apy/365/86400*5;
+      }
+    });
+    // Update positions P&L
+    if(S.page==='dashboard') renderDash();
+  },5000);
+  go('dashboard');
+  setSide('buy');setLev(10);
+}
+
+window.addEventListener('resize',()=>{
+  if(S.page==='trade') initChart();
+});
+</script>
+</body>
+</html>
