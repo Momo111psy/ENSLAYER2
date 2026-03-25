@@ -142,6 +142,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .lhero-scroll-hint{position:relative;z-index:1;color:var(--text3);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .lhero-scroll-hint::after{content:'';width:1px;height:32px;background:linear-gradient(var(--text3),transparent)}
 
+/* Hero Chart */
+.hero-chart-wrap{
+  position:relative;z-index:1;width:100%;max-width:920px;
+  margin:0 auto 40px;
+  background:rgba(15,22,36,.7);border:1px solid var(--border);
+  border-radius:16px;padding:20px 20px 12px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 80px rgba(59,126,255,.06);
+  backdrop-filter:blur(8px);
+}
+.hero-chart-wrap canvas{width:100%;height:280px;display:block;border-radius:8px}
+.hero-chart-overlay{
+  position:absolute;top:16px;left:24px;
+  display:flex;align-items:center;gap:16px;
+}
+.hco-price{font-size:22px;font-weight:700}
+.hco-label{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.5px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
 /* Live ticker strip */
 .lticker{
   background:var(--bg1);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
@@ -898,6 +916,14 @@ tr:hover td{background:rgba(255,255,255,.01)}
         ⚡ Try Live Demo
       </button>
     </div>
+    <!-- HERO CHART -->
+    <div class="hero-chart-wrap">
+      <canvas id="heroChart" width="900" height="320"></canvas>
+      <div class="hero-chart-overlay">
+        <div class="hco-price"><span class="up mono" id="heroPrice">$97,432.18</span><span class="up mono" style="font-size:13px;margin-left:8px">+2.34%</span></div>
+        <div class="hco-label">BTC/USDT · 1H</div>
+      </div>
+    </div>
     <div class="lhero-scroll-hint">Scroll to explore</div>
   </section>
 
@@ -1627,8 +1653,119 @@ tr:hover td{background:rgba(255,255,255,.01)}
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   STATE
+   HERO CANDLESTICK CHART
 ═══════════════════════════════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('heroChart');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  const W=c.width,H=c.height;
+  // Generate realistic candlestick data
+  let price=97000, candles=[];
+  for(let i=0;i<60;i++){
+    const open=price;
+    const vol=(Math.random()-0.48)*800;
+    const close=open+vol;
+    const high=Math.max(open,close)+Math.random()*300;
+    const low=Math.min(open,close)-Math.random()*300;
+    candles.push({open,close,high,low});
+    price=close;
+  }
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // Grid lines
+    ctx.strokeStyle='rgba(59,126,255,.06)';
+    ctx.lineWidth=1;
+    for(let y=40;y<H;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    for(let x=60;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    // Price range
+    let mn=Infinity,mx=-Infinity;
+    candles.forEach(c=>{mn=Math.min(mn,c.low);mx=Math.max(mx,c.high);});
+    const range=mx-mn||1;
+    const pad=20;
+    const cw=(W-pad*2)/candles.length;
+    // Moving average line
+    ctx.beginPath();
+    ctx.strokeStyle='rgba(168,85,247,.5)';
+    ctx.lineWidth=2;
+    let started=false;
+    for(let i=4;i<candles.length;i++){
+      let avg=0;for(let j=i-4;j<=i;j++)avg+=candles[j].close;avg/=5;
+      const x=pad+i*cw+cw/2;
+      const y=H-pad-((avg-mn)/range)*(H-pad*2);
+      if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // Area fill under MA
+    const lastX=pad+(candles.length-1)*cw+cw/2;
+    ctx.lineTo(lastX,H-pad);
+    ctx.lineTo(pad+4*cw+cw/2,H-pad);
+    ctx.closePath();
+    const grad=ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'rgba(168,85,247,.12)');
+    grad.addColorStop(1,'rgba(168,85,247,0)');
+    ctx.fillStyle=grad;
+    ctx.fill();
+    // Candles
+    const showCount=Math.min(candles.length, Math.floor(frame/2)+10);
+    for(let i=0;i<showCount&&i<candles.length;i++){
+      const c2=candles[i];
+      const x=pad+i*cw;
+      const green=c2.close>=c2.open;
+      const bodyTop=H-pad-((Math.max(c2.open,c2.close)-mn)/range)*(H-pad*2);
+      const bodyBot=H-pad-((Math.min(c2.open,c2.close)-mn)/range)*(H-pad*2);
+      const wickTop=H-pad-((c2.high-mn)/range)*(H-pad*2);
+      const wickBot=H-pad-((c2.low-mn)/range)*(H-pad*2);
+      // Wick
+      ctx.strokeStyle=green?'#10d97c':'#ff4560';
+      ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.moveTo(x+cw/2,wickTop);
+      ctx.lineTo(x+cw/2,wickBot);
+      ctx.stroke();
+      // Body
+      const bw=cw*0.6;
+      const bh=Math.max(bodyBot-bodyTop,1);
+      ctx.fillStyle=green?'#10d97c':'#ff4560';
+      if(green){
+        ctx.fillStyle='rgba(16,217,124,.85)';
+        ctx.fillRect(x+(cw-bw)/2,bodyTop,bw,bh);
+      }else{
+        ctx.fillStyle='rgba(255,69,96,.85)';
+        ctx.fillRect(x+(cw-bw)/2,bodyTop,bw,bh);
+      }
+    }
+    // Volume bars at bottom
+    for(let i=0;i<showCount&&i<candles.length;i++){
+      const c2=candles[i];
+      const x=pad+i*cw;
+      const green=c2.close>=c2.open;
+      const volH=Math.random()*30+5;
+      ctx.fillStyle=green?'rgba(16,217,124,.15)':'rgba(255,69,96,.15)';
+      ctx.fillRect(x+2,H-volH,cw-4,volH);
+    }
+    frame++;
+    // Shift candles slowly
+    if(frame%120===0){
+      candles.shift();
+      const last=candles[candles.length-1];
+      const o=last.close;
+      const v=(Math.random()-0.48)*600;
+      const cl=o+v;
+      candles.push({open:o,close:cl,high:Math.max(o,cl)+Math.random()*200,low:Math.min(o,cl)-Math.random()*200});
+      // Update price display
+      const pe=document.getElementById('heroPrice');
+      if(pe){
+        const p=candles[candles.length-1].close;
+        pe.textContent='$'+p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
 const SEED = {BTC:87420,ETH:3210,SOL:148,BNB:412,XRP:0.62};
 const COIN_NAMES = {BTC:'Bitcoin',ETH:'Ethereum',SOL:'Solana',USDT:'Tether USD',BNB:'BNB Chain',XRP:'Ripple'};
 const COIN_FULL = {BTC:'Bitcoin',ETH:'Ethereum',SOL:'Solana',USDT:'Tether',BNB:'BNB',XRP:'Ripple'};
